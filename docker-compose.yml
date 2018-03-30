@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+    frontend:
+        build:
+            context: frontend
+        container_name: "frontend"
+        image: frontend
+        ports:
+            - "3000:80"
+        volumes:
+            - ./frontend/public:/app/frontend/public
+            - ./frontend/src:/app/frontend/src
+            - ./frontend/package.json:/app/frontend/package.json
+            - ./frontend/yarn.lock:/app/frontend/yarn.lock
+        tmpfs:
+            - /tmp
+        environment:
+            - PORT=80
+    rustend:
+        build:
+            context: rustend
+        container_name: "rustend"
+        image: rustend
+        ports:
+            - "8000:80"
+        volumes:
+            - ./rustend/src:/app/rustend/src
+            - pg-data:/var/lib/postgresql:delegated
+            - ./rustend/Cargo.toml:/app/rustend/Cargo.toml
+        tmpfs:
+            - /tmp
+
+volumes:
+    pg-data:

@@ -6,7 +6,7 @@ import { withStyles } from 'material-ui/styles'
 import {MenuBar} from './components/common/MenuBar'
 import {MenuDrawer} from './components/common/MenuDrawer'
 import {EditItem} from './components/game_master/edit_item/EditItem'
-import {Backpack} from './components/backpack'
+import {Inventory} from './components/player/inventory/inventory'
 
 import Button from 'material-ui/Button'
 
@@ -34,26 +34,20 @@ class App extends Component {
 
 	toggleMenu = (open) => () => {
 		if (this.state.menu.open !== open) {
-		    const state = {...this.state}
-		    state.menu.open = open
-            this.setState(state)
+            this.setState({menu: {...this.state.menu, open: open}})
 		}
 	}
 
-	saveMode(page) {
-	    this.setState({mode: page})
-    }
-
-	handleChangePage(newPage) {
-	    console.log('e', newPage)
-        this.saveMode(newPage)
+	handleChangePage(newpage) {
+        if (this.state.mode !== newpage) {
+            this.setState({mode: newpage})
+        }
     }
 
     getPageContents () {
-	    console.log('getPageContents: ', this.state.mode)
         switch (this.state.mode) {
             case 'INVENTORY':
-                return ( <Backpack /> )
+                return ( <Inventory /> )
             case 'ADD_ITEM':
                 return ( <EditItem /> )
         }
@@ -81,7 +75,6 @@ class App extends Component {
                     isGM={this.state.menu.isGM}
                     handleChangePage={this.handleChangePage}
                 />
-                <Button onClick={() => {this.setState({page: 'INVENTORY'})}}>Go to inventory</Button>
                 {this.getPageContents()}
 			</div>
 		);

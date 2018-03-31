@@ -1,12 +1,25 @@
 import React, {Component} from 'react';
 import Button from 'material-ui/Button';
+import TextField from 'material-ui/TextField';
+import AppBar from 'material-ui/AppBar';
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
 import './App.css';
+import { withStyles } from 'material-ui/styles';
+
+const styles = {
+	flex: {
+		flex: 1,
+	},
+};
 
 class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			name: '',
+			value: 1,
+			description: '',
 		};
 		this.getFromRust = this.getFromRust.bind(this);
 		this.saveItem = this.saveItem.bind(this);
@@ -31,17 +44,25 @@ class App extends Component {
 	}
 
 	render() {
+		const { classes } = this.props;
 		return (
 			<div className="App">
-				<p className="App-intro">
-					To get started, edit <code>src/App.js</code> and save to reload.
-				</p>
-				<button onClick={this.getFromRust}>Rust Me</button>
+				<AppBar position="static">
+					<Toolbar>
+						<Typography variant="title" color="inherit" className={classes.flex}>
+							Tetris.Stream - Item builder
+						</Typography>
+						<Button color="inherit">Do Nothing</Button>
+					</Toolbar>
+				</AppBar>
 				<form onSubmit={this.saveItem}>
-					<label>
-						Item Name:
-						<input type="text" name="name" value={this.state.name} onChange={this.handleChange} />
-					</label>
+					<TextField type="text" name="name" label="Item Name" value={this.state.name} onChange={this.handleChange} /><br/>
+					<TextField type="number" name="value" label="Value (gold)" value={this.state.value} onChange={this.handleChange} /><br/>
+					<TextField name="description" multiline label="Description" value={this.state.description} onChange={this.handleChange}
+						placeholder="Deals over 9000 damage to dust mites" rows="3"
+					/><br/>
+
+					<br/><br/>
 					<Button variant="raised" color="primary">
 						Save
 					</Button>
@@ -51,4 +72,4 @@ class App extends Component {
 	}
 }
 
-export default App;
+export default withStyles(styles)(App);

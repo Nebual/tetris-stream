@@ -1,11 +1,15 @@
-import React, {Component} from 'react';
-import Button from 'material-ui/Button';
-import TextField from 'material-ui/TextField';
-import AppBar from 'material-ui/AppBar';
-import Toolbar from 'material-ui/Toolbar';
-import Typography from 'material-ui/Typography';
-import './App.css';
-import { withStyles } from 'material-ui/styles';
+import React, {Component} from 'react'
+import Button from 'material-ui/Button'
+import TextField from 'material-ui/TextField'
+import AppBar from 'material-ui/AppBar'
+import Toolbar from 'material-ui/Toolbar'
+import Typography from 'material-ui/Typography'
+import './App.css'
+import './layout-styles.css'
+import './resize-styles.css'
+import { withStyles } from 'material-ui/styles'
+
+import {Backpack} from './backpack'
 
 const styles = {
 	flex: {
@@ -87,6 +91,9 @@ class App extends Component {
 					<Button variant="raised" color="primary" type="submit">
 						Save
 					</Button>
+					<div>
+						<Backpack />
+					</div>
 				</form>
 			</div>
 		);

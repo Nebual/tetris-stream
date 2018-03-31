@@ -10,3 +10,16 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.react-grid-layout {
+  background-color: #222123;
+  border: 4mm ridge rgba(236, 122, 20, 0.87);
+  width: 600px;
+  height: 234px;
+  margin: 0 auto;
+  
+}
+
+.item {
+  background-color: aqua;
+}

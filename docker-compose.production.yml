@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+    frontend:
+        build:
+            context: frontend
+            dockerfile: Dockerfile.production
+        image: frontend-production
+        ports:
+            - "80:80"
+        environment:
+            - PRODUCTION=true
+    rustend:
+        build:
+            context: rustend
+            dockerfile: Dockerfile.production
+        image: rustend-production
+        environment:
+            - ROCKET_ENV=staging

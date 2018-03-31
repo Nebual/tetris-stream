@@ -1,1 +1,4 @@
 target
+Dockerfile
+Dockerfile.production
+.trigger-successful-build

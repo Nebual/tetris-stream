@@ -6,13 +6,6 @@ services:
             context: frontend
         container_name: "frontend"
         image: frontend
-        ports:
-            - "3000:80"
-        volumes:
-            - ./frontend/public:/app/frontend/public
-            - ./frontend/src:/app/frontend/src
-            - ./frontend/package.json:/app/frontend/package.json
-            - ./frontend/yarn.lock:/app/frontend/yarn.lock
         tmpfs:
             - /tmp
         environment:
@@ -28,8 +21,6 @@ services:
             - db
         environment:
             DATABASE_URL: postgres://postgres:supersecretpassword2@db/rustydb
-        volumes:
-            - ./rustend:/app/rustend
         tmpfs:
             - /tmp
     db:

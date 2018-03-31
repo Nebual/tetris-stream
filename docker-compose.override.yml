@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+    frontend:
+        ports:
+            - "3000:80"
+        volumes:
+            - ./frontend:/app/frontend
+    rustend:
+        volumes:
+            - ./rustend:/app/rustend

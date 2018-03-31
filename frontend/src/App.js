@@ -28,13 +28,24 @@ class App extends Component {
 
 	async saveItem(e) {
 		e.preventDefault();
-		let response = await fetch('http://localhost:8000/item', {
-			method: this.state.id > 0 ? 'PATCH' : 'POST',
+		let url = 'http://localhost:8000/item';
+		let method = 'POST';
+		if (this.state.id > 0) {
+			url += '/' + this.state.id;
+			method = 'PATCH';
+		}
+		let response = await fetch(url, {
+			method: method,
 			body: JSON.stringify({
 				id: this.state.id,
 				name: this.state.name,
 				price: parseInt(this.state.price, 10),
-				description: this.state.description,
+				public_description: this.state.description,
+				mechanical_description: '',
+				hidden_description: '',
+				width: 1,
+				height: 1,
+				image_url: ''
 			}),
 			headers: {
 				'Content-Type': 'application/json',

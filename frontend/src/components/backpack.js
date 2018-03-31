@@ -1,8 +1,8 @@
 import React from 'react'
 import GridLayout from 'react-grid-layout'
 
-import './layout-styles.css'
-import './resize-styles.css'
+import '../layout-styles.css'
+import '../resize-styles.css'
 
 export class Backpack extends React.Component{
     render() {
@@ -20,7 +20,7 @@ export class Backpack extends React.Component{
                 cols={10}
                 rowHeight={51}
                 width={600}
-                verticalCompact={false}
+                compactType={null}
                 containerPadding={[0,0]}
                 isResizable={false}
                 preventCollision={true}

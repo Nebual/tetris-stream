@@ -1,15 +1,14 @@
 import React, {Component} from 'react'
-import Button from 'material-ui/Button'
-import TextField from 'material-ui/TextField'
-import AppBar from 'material-ui/AppBar'
-import Toolbar from 'material-ui/Toolbar'
-import Typography from 'material-ui/Typography'
+
 import './App.css'
-import './layout-styles.css'
-import './resize-styles.css'
 import { withStyles } from 'material-ui/styles'
 
-import {Backpack} from './backpack'
+import {MenuBar} from './components/common/MenuBar'
+import {MenuDrawer} from './components/common/MenuDrawer'
+import {EditItem} from './components/game_master/edit_item/EditItem'
+import {Backpack} from './components/backpack'
+
+import Button from 'material-ui/Button'
 
 const styles = {
 	flex: {
@@ -17,73 +16,73 @@ const styles = {
 	},
 };
 
+
 class App extends Component {
 	constructor(props) {
-		super(props);
+		super(props)
 		this.state = {
-			id: 0,
-			name: '',
-			price: 1,
-			description: '',
-		};
-		this.saveItem = this.saveItem.bind(this);
-		this.handleChange = this.handleChange.bind(this);
+            mode: 'ADD_ITEM',
+            menu: {
+			    open: false,
+                isGM: true
+            }
+		}
+		this.toggleMenu = this.toggleMenu.bind(this)
+        this.handleChangePage = this.handleChangePage.bind(this)
+        this.getPageContents = this.getPageContents.bind(this)
 	}
 
-	async saveItem(e) {
-		e.preventDefault();
-		let response = await fetch('http://localhost:8000/item', {
-			method: this.state.id > 0 ? 'PATCH' : 'POST',
-			body: JSON.stringify({
-				id: this.state.id,
-				name: this.state.name,
-				price: parseInt(this.state.price, 10),
-				description: this.state.description,
-			}),
-			headers: {
-				'Content-Type': 'application/json',
-			}
-		});
-		let json = await response.json();
-		this.setState({
-			id: json['id'],
-		});
+	toggleMenu = (open) => () => {
+		if (this.state.menu.open !== open) {
+		    const state = {...this.state}
+		    state.menu.open = open
+            this.setState(state)
+		}
 	}
 
-	handleChange(e) {
-		this.setState({
-			[e.target.name]: e.target.value
-		});
+	saveMode(page) {
+	    this.setState({mode: page})
+    }
+
+	handleChangePage(newPage) {
+	    console.log('e', newPage)
+        this.saveMode(newPage)
+    }
+
+    getPageContents () {
+	    console.log('getPageContents: ', this.state.mode)
+        switch (this.state.mode) {
+            case 'INVENTORY':
+                return ( <Backpack /> )
+            case 'ADD_ITEM':
+                return ( <EditItem /> )
+        }
+
 	}
+
+
+	// this page should mostly just hold the app bar and drawer, then switch the contents of the page based of the state,
+	// each page should have it's own folder in the components folder under wither the player folder or game_master folder
 
 	render() {
 		const { classes } = this.props;
+        console.log("doin a render", this.state)
 		return (
 			<div className="App">
-				<AppBar position="static">
-					<Toolbar>
-						<Typography variant="title" color="inherit" className={classes.flex}>
-							Tetris.Stream - Item builder
-						</Typography>
-						<Button color="inherit">Do Nothing</Button>
-					</Toolbar>
-				</AppBar>
-				<form onSubmit={this.saveItem}>
-					<input type="hidden" name="id" value={this.state.id} />
-					<TextField type="text" name="name" label="Item Name" value={this.state.name} onChange={this.handleChange} /><br/>
-					<TextField type="number" name="price" label="Value (gold)" value={this.state.price} onChange={this.handleChange} /><br/>
-					<TextField name="description" multiline label="Description" value={this.state.description} onChange={this.handleChange}
-						placeholder="Deals over 9000 damage to dust mites" rows="3"
-					/><br/>
-
-					<br/><br/>
-					<Button variant="raised" color="primary" type="submit">
-						Save
-					</Button>
-					<div>
-						<Backpack />
-					</div>
-				</form>
+				<MenuBar
+                    classes={classes}
+                    toggleMenu={this.toggleMenu}
+                    page={this.state.mode}
+                />
+				<MenuDrawer
+                    classes={classes}
+                    toggleMenu={this.toggleMenu}
+                    menuOpen={this.state.menu.open}
+                    isGM={this.state.menu.isGM}
+                    handleChangePage={this.handleChangePage}
+                />
+                <Button onClick={() => {this.setState({page: 'INVENTORY'})}}>Go to inventory</Button>
+                {this.getPageContents()}
 			</div>
 		);
 	}

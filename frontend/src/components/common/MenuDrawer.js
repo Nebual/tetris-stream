@@ -24,7 +24,7 @@ export class MenuDrawer extends React.Component{
                         </ListItemIcon>
                         <ListItemText primary="Character Select"/>
                     </ListItem>
-                    <ListItem button={true} name="INVENTORY" onClick={() => {return this.props.handleChangePage('INVENTORY')}}>
+                    <ListItem button onClick={() => {this.props.handleChangePage('INVENTORY')}}>
                         <ListItemIcon>
                             <InventoryIcon />
                         </ListItemIcon>
@@ -40,7 +40,7 @@ export class MenuDrawer extends React.Component{
                             </ListItemIcon>
                             <ListItemText primary="Manage Game"/>
                         </ListItem>
-                        <ListItem button={true} name="ADD_ITEM" onClick={() => {return this.props.handleChangePage('ADD_ITEM')}}>
+                        <ListItem button onClick={() => {this.props.handleChangePage('ADD_ITEM')}}>
                             <ListItemIcon>
                                 <ItemIcon />
                             </ListItemIcon>

@@ -1,16 +1,16 @@
 import React from 'react'
 import GridLayout from 'react-grid-layout'
 
-import '../layout-styles.css'
-import '../resize-styles.css'
+import '../../../layout-styles.css'
+import '../../../resize-styles.css'
 
-export class Backpack extends React.Component{
+export class Inventory extends React.Component{
     render() {
         const layout = [
-            {i: 'a', x: 3, y: 3, w: 1, h: 1, name: 'dagger'},
-            {i: 'b', x: 3, y: 0, w: 2, h: 3, name: 'shield'},
-            {i: 'c', x: 0, y: 0, w: 3, h: 4, name: 'full plate'},
-            {i: 'd', x: 4, y: 3, w: 1, h: 1, name: 'health potion'}
+            {i: 'a', x: 3, y: 3, w: 1, h: 1},
+            {i: 'b', x: 3, y: 0, w: 2, h: 3},
+            {i: 'c', x: 0, y: 0, w: 3, h: 4},
+            {i: 'd', x: 4, y: 3, w: 1, h: 1}
         ]
 
         return (

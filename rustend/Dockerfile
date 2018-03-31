@@ -11,17 +11,18 @@ RUN set -eux; \
     rm rustup-init; \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME;
 
-RUN cargo install watchexec
+RUN cargo install cargo-watch
+RUN cargo install diesel_cli --no-default-features --features postgres
 
 # Rust libraries
-COPY Cargo.toml Cargo.lock /app/rustend/
 WORKDIR /app/rustend
-RUN mkdir src && touch src/lib.rs && cargo build --lib && rm -rf src
-EXPOSE 8000
+#COPY Cargo.toml Cargo.lock /app/rustend/
+#RUN mkdir src target && touch src/lib.rs && cargo build --lib && rm -rf src
 
 # Rust build
-COPY . /app/rustend
-WORKDIR /app/rustend
-RUN cargo build
+#COPY . /app/rustend
+#RUN cargo build
 
-CMD ["watchexec", "--exts", ".rs", "--restart", "cargo run"]
+EXPOSE 8000
+
+CMD ["/app/rustend/start.sh"]

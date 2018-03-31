@@ -1,0 +1,6 @@
+CREATE TABLE item (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  price INTEGER NOT NULL,
+  description TEXT NOT NULL
+)

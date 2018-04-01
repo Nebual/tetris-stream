@@ -11,7 +11,8 @@ export class MenuBar extends React.Component{
 
         const pageTitles = {
             INVENTORY: 'Player Inventory',
-            ADD_ITEM: 'Item Editor'
+            ADD_ITEM: 'Item Editor',
+            LIST_ITEMS: 'List Items'
         }
 
         return (

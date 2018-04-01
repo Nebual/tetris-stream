@@ -7,8 +7,7 @@ import {MenuBar} from './components/common/MenuBar'
 import {MenuDrawer} from './components/common/MenuDrawer'
 import {EditItem} from './components/game_master/edit_item/EditItem'
 import {Inventory} from './components/player/inventory/inventory'
-
-import Button from 'material-ui/Button'
+import {ListItemComponent} from './components/game_master/list_items/ListItemComponent'
 
 const styles = {
 	flex: {
@@ -20,8 +19,11 @@ const styles = {
 class App extends Component {
 	constructor(props) {
 		super(props)
+
+        const current_page = localStorage.getItem('current_page')
+
 		this.state = {
-            mode: 'ADD_ITEM',
+            mode: current_page || 'INVENTORY',
             menu: {
 			    open: false,
                 isGM: true
@@ -41,6 +43,7 @@ class App extends Component {
 	handleChangePage(newpage) {
         if (this.state.mode !== newpage) {
             this.setState({mode: newpage})
+            localStorage.setItem('current_page', newpage)
         }
     }
 
@@ -50,6 +53,8 @@ class App extends Component {
                 return ( <Inventory /> )
             case 'ADD_ITEM':
                 return ( <EditItem /> )
+			case 'LIST_ITEMS':
+				return ( <ListItemComponent />)
         }
 
 	}

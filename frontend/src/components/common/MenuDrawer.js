@@ -34,7 +34,7 @@ export class MenuDrawer extends React.Component{
                 <Divider />
                 {this.props.isGM ? (
                     <List>
-                        <ListItem button>
+                        <ListItem button onClick={() => {this.props.handleChangePage('LIST_ITEMS')}}>
                             <ListItemIcon>
                                 <GameIcon />
                             </ListItemIcon>

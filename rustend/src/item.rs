@@ -4,7 +4,6 @@ use DbConn;
 
 use models::*;
 use schema::template_item;
-use schema::template_item::dsl::*;
 
 use rocket::response::status;
 use rocket_contrib::Json;
@@ -12,15 +11,31 @@ use rocket_contrib::Json;
 #[get("/")]
 fn index(conn: DbConn) -> QueryResult<Json<Vec<TemplateItem>>>
 {
-    let item_request = template_item.load(&*conn)?;
+    let item_request = template_item::table.load(&*conn)?;
     Ok(Json(item_request))
 }
 
+#[derive(FromForm)]
+struct SearchParams {
+    name: Option<String>,
+}
+
+#[get("/?<params>")]
+fn search(conn: DbConn, params: SearchParams) -> QueryResult<Json<Vec<TemplateItem>>>
+{
+    //let params = params.unwrap();
+    let mut sql = template_item::table.into_boxed();
+    if let Some(name) = params.name {
+        sql = sql.filter(template_item::dsl::name.like(format!("%{}%", name)));
+    }
+    let item_request = sql.load(&*conn)?;
+    Ok(Json(item_request))
+}
 
 #[get("/<item_id>")]
 fn get(item_id: i32, conn: DbConn) -> Option<Json<TemplateItem>>
 {
-    if let Ok(result) = template_item.find(item_id).get_result(&*conn) {
+    if let Ok(result) = template_item::table.find(item_id).get_result(&*conn) {
         Some(Json(result))
     } else {
         None
@@ -30,7 +45,7 @@ fn get(item_id: i32, conn: DbConn) -> Option<Json<TemplateItem>>
 #[post("/", data = "<new_item>")]
 fn create(conn: DbConn, new_item: Json<NewTemplateItem>) -> QueryResult<Json<TemplateItem>>
 {
-    diesel::insert_into(template_item)
+    diesel::insert_into(template_item::table)
         .values(&new_item.into_inner())
         .get_result::<TemplateItem>(&*conn)
         .map(|p| Json(p))

@@ -1,0 +1,4 @@
+ALTER TABLE inventory_item
+  ADD COLUMN visible_mechanical BOOLEAN NOT NULL DEFAULT FALSE,
+  ADD COLUMN visible_private BOOLEAN NOT NULL DEFAULT FALSE
+;

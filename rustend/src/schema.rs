@@ -10,6 +10,8 @@ table! {
         width -> Nullable<Int4>,
         height -> Nullable<Int4>,
         image_url -> Nullable<Text>,
+        visible_mechanical -> Bool,
+        visible_private -> Bool,
     }
 }
 

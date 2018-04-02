@@ -21,6 +21,7 @@ services:
             - db
         environment:
             DATABASE_URL: postgres://postgres:supersecretpassword2@db/rustydb
+            CARGO_INCREMENTAL: 1
         tmpfs:
             - /tmp
     db:

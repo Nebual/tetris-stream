@@ -80,7 +80,7 @@ fn rocket(is_test: bool) -> Rocket {
         .attach(build_cors_fairing())
         .catch(errors![error_400, not_found, error_500])
         .mount("/", routes![index])
-        .mount("/item", routes![item::index, item::get, item::create, item::update, item::delete])
+        .mount("/item", routes![item::index, item::search, item::get, item::create, item::update, item::delete])
         .mount("/inventoryitem", routes![inventoryitem::index, inventoryitem::get, inventoryitem::create, inventoryitem::update, inventoryitem::delete])
 }
 

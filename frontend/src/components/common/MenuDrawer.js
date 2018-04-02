@@ -18,7 +18,7 @@ export class MenuDrawer extends React.Component{
         const fullList = (
             <div className={this.props.classes.fullList}>
                 <List>
-                    <ListItem button>
+                    <ListItem button onClick={() => {this.props.handleChangePage('CHARACTER_SELECT')}}>
                         <ListItemIcon>
                             <AccountIcon />
                         </ListItemIcon>
@@ -34,19 +34,31 @@ export class MenuDrawer extends React.Component{
                 <Divider />
                 {this.props.isGM ? (
                     <List>
-                        <ListItem button onClick={() => {this.props.handleChangePage('LIST_ITEMS')}}>
+                        <ListItem button onClick={() => {this.props.handleChangePage('LIST_GAMES')}}>
                             <ListItemIcon>
                                 <GameIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Manage Game"/>
+                            <ListItemText primary="Games"/>
                         </ListItem>
-                        <ListItem button onClick={() => {this.props.handleChangePage('ADD_ITEM')}}>
+                        <ListItem button onClick={() => {this.props.handleChangePage('LIST_PLAYERS')}}>
+                            <ListItemIcon>
+                                <GameIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Players"/>
+                        </ListItem>
+                        <ListItem button onClick={() => {this.props.handleChangePage('LIST_TEMPLATES')}}>
+                            <ListItemIcon>
+                                <ItemIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Templates"/>
+                        </ListItem>
+                        <ListItem button onClick={() => {this.props.handleChangePage('LIST_ITEMS')}}>
                             <ListItemIcon>
                                 <ItemIcon />
                             </ListItemIcon>
                             <ListItemText primary="Items"/>
                         </ListItem>
-                        <ListItem button>
+                        <ListItem button onClick={() => {this.props.handleChangePage('LIST_CONTAINERS')}}>
                             <ListItemIcon>
                                 <ContainerIcon />
                             </ListItemIcon>

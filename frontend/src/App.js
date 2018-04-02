@@ -5,9 +5,12 @@ import { withStyles } from 'material-ui/styles'
 
 import {MenuBar} from './components/common/MenuBar'
 import {MenuDrawer} from './components/common/MenuDrawer'
-import {EditItem} from './components/game_master/edit_item/EditItem'
+
 import {Inventory} from './components/player/inventory/inventory'
-import {ListItemComponent} from './components/game_master/list_items/ListItemComponent'
+import {ListTemplateComponent} from './components/game_master/template/list/ListTemplateComponent'
+import {EditTemplateComponent} from './components/game_master/template/edit/EditTemplateComponent'
+import {ListItemComponent} from './components/game_master/item/list/ListItemComponent'
+import {EditItemComponent} from './components/game_master/item/edit/EditItemComponent'
 
 const styles = {
 	flex: {
@@ -21,9 +24,11 @@ class App extends Component {
 		super(props)
 
         const current_page = localStorage.getItem('current_page')
+		const template_id = localStorage.getItem('template_id')
 
 		this.state = {
             mode: current_page || 'INVENTORY',
+			template_id: template_id || null,
             menu: {
 			    open: false,
                 isGM: true
@@ -31,6 +36,7 @@ class App extends Component {
 		}
 		this.toggleMenu = this.toggleMenu.bind(this)
         this.handleChangePage = this.handleChangePage.bind(this)
+        this.handleChangeTemplate = this.handleChangeTemplate.bind(this)
         this.getPageContents = this.getPageContents.bind(this)
 	}
 
@@ -47,17 +53,45 @@ class App extends Component {
         }
     }
 
+    handleChangeTemplate(newTemplate) {
+        if (this.state.template_id !== newTemplate) {
+            this.setState({template_id: newTemplate})
+            localStorage.setItem('template_id', newTemplate)
+        }
+    }
+
     getPageContents () {
         switch (this.state.mode) {
+			case 'CHARACTER_SELECT':
+				return null
             case 'INVENTORY':
                 return ( <Inventory /> )
-            case 'ADD_ITEM':
-                return ( <EditItem /> )
-			default:
-				console.log("Invalid mode: " + this.state.mode)
-				// noinspection FallThroughInSwitchStatementJS
+			case 'LIST_GAMES':
+				return null
+			case 'LIST_PLAYERS':
+				return null
+            case 'EDIT_TEMPLATE':
+                return (
+                	<EditTemplateComponent
+						template_id={this.state.template_id}
+					/>
+				)
+            case 'LIST_TEMPLATES':
+                return (
+                	<ListTemplateComponent
+                        handleChangePage={this.handleChangePage}
+                        handleChangeTemplate={this.handleChangeTemplate}
+					/>
+				)
+            case 'EDIT_ITEM':
+                return ( <EditItemComponent /> )
 			case 'LIST_ITEMS':
 				return ( <ListItemComponent />)
+            default:
+                console.log("Invalid mode: " + this.state.mode)
+            // noinspection FallThroughInSwitchStatementJS
+			case 'LIST_CONTAINERS':
+				return null
         }
 	}
 

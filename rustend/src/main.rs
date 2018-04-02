@@ -1,10 +1,11 @@
 #![allow(unused_imports)]
 
-#![feature(plugin)]
+#![feature(plugin, custom_derive)]
 #![plugin(rocket_codegen)]
 #![feature(custom_attribute)]
 
 extern crate rocket;
+#[macro_use]
 extern crate rocket_contrib;
 extern crate rocket_cors;
 extern crate serde_json;
@@ -37,6 +38,31 @@ fn index() -> &'static str {
     "Hello, world! Boop!!!!!"
 }
 
+
+#[error(400)]
+fn error_400() -> rocket_contrib::Json<rocket_contrib::Value> {
+    rocket_contrib::Json(json!({
+        "status": "error",
+        "reason": "Invalid request",
+    }))
+}
+
+#[error(404)]
+fn not_found() -> rocket_contrib::Json<rocket_contrib::Value> {
+    rocket_contrib::Json(json!({
+        "status": "error",
+        "reason": "Resource was not found.",
+    }))
+}
+
+#[error(500)]
+fn error_500() -> rocket_contrib::Json<rocket_contrib::Value> {
+    rocket_contrib::Json(json!({
+        "status": "error",
+        "reason": "Server 500'd",
+    }))
+}
+
 fn main() {
     rocket(false).launch();
 }
@@ -52,6 +78,7 @@ fn rocket(is_test: bool) -> Rocket {
     })
         .manage(build_pg_pool())
         .attach(build_cors_fairing())
+        .catch(errors![error_400, not_found, error_500])
         .mount("/", routes![index])
         .mount("/item", routes![item::index, item::get, item::create, item::update, item::delete])
         .mount("/inventoryitem", routes![inventoryitem::index, inventoryitem::get, inventoryitem::create, inventoryitem::update, inventoryitem::delete])

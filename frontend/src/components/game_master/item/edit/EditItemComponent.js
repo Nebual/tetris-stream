@@ -7,40 +7,74 @@ export class EditItemComponent extends React.Component{
         super(props)
         this.state = {
             id: 0,
+            template_id: 0,
             name: '',
-            price: 1,
-            description: '',
+            public_description: '',
+            mechanical_description: '',
+            hidden_description: '',
+            price: 0,
+            width: 1,
+            height: 1,
+            image_url: ''
         }
 
         this.saveItem = this.saveItem.bind(this)
         this.handleChange = this.handleChange.bind(this)
     }
 
+    async componentDidMount() {
+        if (this.props.item_id && this.props.item_id > 0) {
+            const data = await fetch(`http://localhost:8000/inventoryitem/${this.props.item_id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            const item = await data.json()
+            const payload = {
+                id: item.id || 0,
+                template_id: item.template_id,
+                name: item.name || '',
+                public_description: item.public_description || '',
+                mechanical_description: item.mechanical_description || '',
+                hidden_description: item.hidden_description || '',
+                price: item.price || 0,
+                width: item.width || 0,
+                height: item.height || 0,
+                image_url: item.image_url || ''
+            }
+            this.setState(payload)
+        }
+    }
+
     async saveItem(e) {
         e.preventDefault();
-		let url = 'http://localhost:8000/item';
-		let method = 'POST';
-		if (this.state.id > 0) {
-			url += '/' + this.state.id;
-			method = 'PATCH';
-		}
-		let response = await fetch(url, {
-			method: method,
-			body: JSON.stringify({
-				id: this.state.id,
-				name: this.state.name,
-				price: parseInt(this.state.price, 10),
-				public_description: this.state.description,
-				mechanical_description: '',
-				hidden_description: '',
-				width: 1,
-				height: 1,
-				image_url: ''
-			}),
-			headers: {
-				'Content-Type': 'application/json',
-			}
-		});
+        let url = 'http://localhost:8000/inventoryitem';
+        let method = 'POST';
+        if (this.state.id > 0) {
+            url += '/' + this.state.id;
+            method = 'PATCH';
+        }
+        let response = await fetch(url, {
+            method: method,
+            body: JSON.stringify({
+                id: parseInt(this.state.id, 10),
+                template_id: parseInt(this.state.template_id, 10) || 0,
+                name: this.state.name || '',
+                price: parseInt(this.state.price, 10) || 0,
+                public_description: this.state.public_description || '',
+                mechanical_description: this.state.mechanical_description || '',
+                hidden_description: this.state.hidden_description || '',
+                visible_mechanical: 0,
+                visible_hidden: 0,
+                width: parseInt(this.state.width, 10) || 1,
+                height: parseInt(this.state.height, 10) || 1,
+                image_url: this.state.image_url || ''
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
         let json = await response.json();
         this.setState({
             id: json['id'],
@@ -59,10 +93,65 @@ export class EditItemComponent extends React.Component{
         return (
             <form onSubmit={this.saveItem}>
                 <input type="hidden" name="id" value={this.state.id} />
-                <TextField type="text" name="name" label="Item Name" value={this.state.name} onChange={this.handleChange} /><br/>
-                <TextField type="number" name="price" label="Value (gold)" value={this.state.price} onChange={this.handleChange} /><br/>
-                <TextField name="description" multiline label="Description" value={this.state.description} onChange={this.handleChange}
-                           placeholder="Deals over 9000 damage to dust mites" rows="3"
+                <TextField
+                    type="text"
+                    name="name"
+                    label="Item Name"
+                    value={this.state.name}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    type="text"
+                    name="template_id"
+                    label="Template ID"
+                    value={this.state.template_id}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    type="number"
+                    name="price"
+                    label="Value (gold)"
+                    value={this.state.price}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    name="public_description"
+                    multiline label="Public Description"
+                    value={this.state.public_description}
+                    onChange={this.handleChange}
+                    placeholder="A rusty sword with a sharp edge" rows="3"
+                /><br/>
+                <TextField
+                    name="mechanical_description"
+                    multiline label="Mechanical Description"
+                    value={this.state.mechanical_description}
+                    onChange={this.handleChange}
+                    placeholder="+1 Longsword, on a natural one tell the GM" rows="3"
+                /><br/>
+                <TextField
+                    name="hidden_description"
+                    multiline label="Hidden Description"
+                    value={this.state.hidden_description}
+                    onChange={this.handleChange}
+                    placeholder="When a nat 1 is rolled the sword breaks" rows="3"
+                /><br/>
+                <TextField
+                    name="width"
+                    multiline label="Width"
+                    value={this.state.width}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    name="height"
+                    multiline label="Height"
+                    value={this.state.height}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    name="image_url"
+                    multiline label="Image_url"
+                    value={this.state.image_url}
+                    onChange={this.handleChange}
                 /><br/>
 
                 <br/><br/>

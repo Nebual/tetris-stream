@@ -17,8 +17,6 @@ use rocket_cors::{AllowedOrigins, AllowedHeaders, AllowedMethods};
 
 #[macro_use]
 extern crate diesel;
-extern crate r2d2;
-extern crate r2d2_diesel;
 
 use std::env;
 

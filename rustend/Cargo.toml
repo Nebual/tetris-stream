@@ -1,21 +1,15 @@
 [package]
 name = "tetris-stream"
 version = "0.1.0"
-authors = ["Ben Allison <ben@checkfront.com>"]
+authors = ["Ben Allison <ben1120@gmail.com>"]
 
 [dependencies]
-rocket = "0.3.6"
-rocket_codegen = "0.3.6"
-rocket_cors = "0.2.3"
+rocket = "0.3.*"
+rocket_codegen = "0.3.*"
+rocket_cors = "0.2.*"
+rocket_contrib = { version = "*", default-features = false, features = ["json"]}
 serde = "*"
 serde_json = "*"
 serde_derive = "*"
 
-diesel = { version = "1.0.*", features = ["postgres"] }
-r2d2-diesel = "1.0.0"
-r2d2 = "0.8.2"
-
-[dependencies.rocket_contrib]
-version = "*"
-default-features = false
-features = ["json"]
+diesel = { version = "1.1.*", features = ["postgres", "r2d2"] }

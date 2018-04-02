@@ -1,6 +1,6 @@
 use diesel;
 use diesel::prelude::*;
-use diesel::types::{Nullable, Text, Integer};
+use diesel::sql_types::{Nullable, Text, Integer};
 use DbConn;
 
 use models::*;

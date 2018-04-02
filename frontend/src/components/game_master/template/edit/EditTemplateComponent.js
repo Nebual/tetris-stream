@@ -22,7 +22,7 @@ export class EditTemplateComponent extends React.Component{
     }
 
     async componentDidMount() {
-        if (this.props.template_id) {
+        if (this.props.template_id && this.props.template_id > 0) {
             const data = await fetch(`http://localhost:8000/item/${this.props.template_id}`, {
                 method: 'GET',
                 headers: {

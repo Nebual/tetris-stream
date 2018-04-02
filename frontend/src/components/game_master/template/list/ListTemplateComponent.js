@@ -24,10 +24,6 @@ export class ListTemplateComponent extends React.Component{
         this.setState({items: newItems})
     }
 
-    handleAddItem() {
-        return this.props.handleChangePage('EDIT_TEMPLATE')
-    }
-
     handleEditItem(id) {
         this.props.handleChangeTemplate(id)
         return this.props.handleChangePage('EDIT_TEMPLATE')
@@ -39,7 +35,7 @@ export class ListTemplateComponent extends React.Component{
             <Grid container spacing={24}>
                 <Grid item xs={10}/>
                 <Grid item xs={2}>
-                    <Button variant="raised" color="primary" onClick={() => this.handleAddItem}>
+                    <Button variant="raised" color="primary" onClick={() => this.handleEditItem(0)}>
                         Add Template
                     </Button>
                 </Grid>

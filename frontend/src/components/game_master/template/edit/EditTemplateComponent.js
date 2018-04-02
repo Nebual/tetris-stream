@@ -57,6 +57,7 @@ export class EditTemplateComponent extends React.Component{
             method: method,
             body: JSON.stringify({
                 id: this.state.id,
+                template_id: parseInt(this.state.template_id, 10),
                 name: this.state.name || '',
                 price: parseInt(this.state.price, 10) || 0,
                 public_description: this.state.public_description || '',

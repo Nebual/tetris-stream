@@ -1,7 +1,8 @@
 import React from 'react'
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
-import Paper from 'material-ui/Paper';
-import Grid from 'material-ui/Grid';
+import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table'
+import Paper from 'material-ui/Paper'
+import Grid from 'material-ui/Grid'
+import Button from 'material-ui/Button'
 
 export class ListItemComponent extends React.Component{
     constructor(props) {
@@ -23,6 +24,11 @@ export class ListItemComponent extends React.Component{
         this.setState({items: newItems})
     }
 
+    handleEditItem(id) {
+        this.props.handleChangeInventoryItem(id)
+        return this.props.handleChangePage('EDIT_ITEM')
+    }
+
     render(){
 
         return(
@@ -36,6 +42,9 @@ export class ListItemComponent extends React.Component{
                                     <TableCell>Name</TableCell>
                                     <TableCell>Description</TableCell>
                                     <TableCell numeric>Price</TableCell>
+                                    <TableCell>
+                                        <Button variant="raised" color="primary" onClick={() => this.handleEditItem(0)}>Add Item</Button>
+                                    </TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -43,8 +52,11 @@ export class ListItemComponent extends React.Component{
                                     <TableRow key={item.id}>
                                         <TableCell numeric>{item.id}</TableCell>
                                         <TableCell>{item.name}</TableCell>
-                                        <TableCell>{item.description}</TableCell>
+                                        <TableCell>{item.public_description}</TableCell>
                                         <TableCell numeric>{item.price}</TableCell>
+                                        <TableCell>
+                                            <Button color="primary" onClick={() => this.handleEditItem(item.id)}>Edit</Button>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

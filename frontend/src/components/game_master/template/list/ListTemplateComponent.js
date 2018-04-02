@@ -1,7 +1,7 @@
 import React from 'react'
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
-import Paper from 'material-ui/Paper';
-import Grid from 'material-ui/Grid';
+import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table'
+import Paper from 'material-ui/Paper'
+import Grid from 'material-ui/Grid'
 import Button from 'material-ui/Button'
 
 export class ListTemplateComponent extends React.Component{

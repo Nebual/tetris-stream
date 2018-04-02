@@ -29,7 +29,7 @@ export class EditTemplateComponent extends React.Component{
                     'Content-Type': 'application/json'
                 }
             })
-            const template = await data.json
+            const template = await data.json()
             const payload = {
                 id: template.id || 0,
                 name: template.name || '',
@@ -57,14 +57,14 @@ export class EditTemplateComponent extends React.Component{
             method: method,
             body: JSON.stringify({
                 id: this.state.id,
-                name: this.state.name,
-                price: parseInt(this.state.price, 10),
-                public_description: this.state.description,
-                mechanical_description: '',
-                hidden_description: '',
-                width: 1,
-                height: 1,
-                image_url: ''
+                name: this.state.name || '',
+                price: parseInt(this.state.price, 10) || 0,
+                public_description: this.state.public_description || '',
+                mechanical_description: this.state.mechanical_description || '',
+                hidden_description: this.state.hidden_description || '',
+                width: this.state.width || 1,
+                height: this.state.height || 1,
+                image_url: this.state.image_url || ''
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -89,10 +89,58 @@ export class EditTemplateComponent extends React.Component{
         return (
             <form onSubmit={this.saveItem}>
                 <input type="hidden" name="id" value={this.state.id} />
-                <TextField type="text" name="name" label="Item Name" value={this.state.name} onChange={this.handleChange} /><br/>
-                <TextField type="number" name="price" label="Value (gold)" value={this.state.price} onChange={this.handleChange} /><br/>
-                <TextField name="description" multiline label="Description" value={this.state.description} onChange={this.handleChange}
-                           placeholder="Deals over 9000 damage to dust mites" rows="3"
+                <TextField
+                    type="text"
+                    name="name"
+                    label="Item Name"
+                    value={this.state.name}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    type="number"
+                    name="price"
+                    label="Value (gold)"
+                    value={this.state.price}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    name="public_description"
+                    multiline label="Public Description"
+                    value={this.state.public_description}
+                    onChange={this.handleChange}
+                    placeholder="A rusty sword with a sharp edge" rows="3"
+                /><br/>
+                <TextField
+                    name="mechanical_description"
+                    multiline label="Mechanical Description"
+                    value={this.state.mechanical_description}
+                    onChange={this.handleChange}
+                    placeholder="+1 Longsword, on a natural one tell the GM" rows="3"
+                /><br/>
+                <TextField
+                    name="hidden_description"
+                    multiline label="Hidden Description"
+                    value={this.state.hidden_description}
+                    onChange={this.handleChange}
+                    placeholder="When a nat 1 is rolled the sword breaks" rows="3"
+                /><br/>
+                <TextField
+                    name="width"
+                    multiline label="Width"
+                    value={this.state.width}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    name="height"
+                    multiline label="Height"
+                    value={this.state.height}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    name="image_url"
+                    multiline label="Image_url"
+                    value={this.state.image_url}
+                    onChange={this.handleChange}
                 /><br/>
 
                 <br/><br/>

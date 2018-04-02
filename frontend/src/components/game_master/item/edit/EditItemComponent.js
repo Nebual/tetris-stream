@@ -2,7 +2,7 @@ import React from 'react'
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
 
-export class EditItem extends React.Component{
+export class EditItemComponent extends React.Component{
     constructor(props) {
         super(props)
         this.state = {

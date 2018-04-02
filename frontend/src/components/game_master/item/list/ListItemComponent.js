@@ -13,7 +13,7 @@ export class ListItemComponent extends React.Component{
     }
 
     async componentDidMount() {
-        const data = await fetch('http://localhost:8000/item', {
+        const data = await fetch('http://localhost:8000/inventoryitem', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

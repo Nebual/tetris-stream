@@ -10,9 +10,16 @@ export class MenuBar extends React.Component{
     render() {
 
         const pageTitles = {
+            CHARACTER_SELECT: 'Character Select',
             INVENTORY: 'Player Inventory',
-            ADD_ITEM: 'Item Editor',
-            LIST_ITEMS: 'List Items'
+            LIST_GAMES: 'List Games',
+            LIST_PLAYERS: 'List Players',
+            EDIT_TEMPLATE: 'Template Editor',
+            LIST_TEMPLATES: 'List Templates',
+            EDIT_ITEM: 'Item Editor',
+            LIST_ITEMS: 'List Items',
+            EDIT_CONTAINER: 'Container Editor',
+            LIST_CONTAINERS: 'List Containers'
         }
 
         return (
@@ -22,7 +29,7 @@ export class MenuBar extends React.Component{
                         <MenuIcon onClick={this.props.toggleMenu(true)} />
                     </IconButton>
                     <Typography variant="title" color="inherit" className={this.props.classes.flex}>
-                        {`Tetris.Stream - ${pageTitles[this.props.page]}`}
+                        {`Tetris.Stream - ${pageTitles[this.props.page] || ''}`}
                     </Typography>
                     <Button color="inherit">Do Nothing</Button>
                 </Toolbar>

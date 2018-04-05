@@ -2,24 +2,14 @@
   text-align: center;
 }
 
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 .react-grid-layout {
   background-color: #222123;
-  border: 4mm ridge rgba(236, 122, 20, 0.87);
-  width: 600px;
-  height: 234px;
+  border: 15px ridge rgba(236, 122, 20, 0.87);
   margin: 0 auto;
-  
 }
 
 .item {
   background-color: aqua;
+  border: 1px solid slategrey;
+  box-sizing: border-box;
 }

@@ -6,7 +6,7 @@ import { withStyles } from 'material-ui/styles'
 import {MenuBar} from './components/common/MenuBar'
 import {MenuDrawer} from './components/common/MenuDrawer'
 
-import {Inventory} from './components/player/inventory/inventory'
+import {InventoryManager} from './components/player/inventory/InventoryManager'
 import {ListTemplateComponent} from './components/game_master/template/list/ListTemplateComponent'
 import {EditTemplateComponent} from './components/game_master/template/edit/EditTemplateComponent'
 import {ListItemComponent} from './components/game_master/item/list/ListItemComponent'
@@ -75,7 +75,11 @@ class App extends Component {
 			case 'CHARACTER_SELECT':
 				return null
             case 'INVENTORY':
-                return ( <Inventory /> )
+                return (
+                    <InventoryManager
+                        inventoryIds={['player', 'chest']}
+                    />
+                )
 			case 'LIST_GAMES':
 				return null
 			case 'LIST_PLAYERS':

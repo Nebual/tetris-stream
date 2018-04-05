@@ -40,8 +40,12 @@ export class Inventory extends React.PureComponent{
 
     constructor(props) {
         super(props)
+        let savedItems
+        try {
+            savedItems = JSON.parse(localStorage.getItem('inventory-' + this.props.prefix))
+        } catch (e) {}
         this.state = {
-            items: [
+            items: savedItems || [
                 {i: this.props.prefix + 'a', x: 3, y: 3, w: 1, h: 1},
                 {i: this.props.prefix + 'b', x: 3, y: 0, w: 2, h: 3},
                 {i: this.props.prefix + 'c', x: 0, y: 0, w: 3, h: 4},
@@ -79,6 +83,7 @@ export class Inventory extends React.PureComponent{
     onLayoutChange(layout) {
         console.log(`${this.props.prefix} layout changed`, layout)
         if (layout !== this.state.items) {
+            localStorage.setItem('inventory-' + this.props.prefix, JSON.stringify(layout))
             this.setState({items: layout})
         }
     }

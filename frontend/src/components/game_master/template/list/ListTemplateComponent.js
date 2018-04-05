@@ -1,10 +1,16 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table'
 import Paper from 'material-ui/Paper'
 import Grid from 'material-ui/Grid'
 import Button from 'material-ui/Button'
 
 export class ListTemplateComponent extends React.Component{
+    static propTypes = {
+        handleChangeTemplate: PropTypes.func.isRequired,
+        handleChangePage: PropTypes.func.isRequired
+    }
+
     constructor(props) {
         super(props)
 

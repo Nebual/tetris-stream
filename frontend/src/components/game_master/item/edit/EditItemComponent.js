@@ -1,8 +1,13 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
 
 export class EditItemComponent extends React.Component{
+    static propTypes = {
+        item_id: PropTypes.string
+    }
+
     constructor(props) {
         super(props)
         this.state = {
@@ -23,7 +28,7 @@ export class EditItemComponent extends React.Component{
     }
 
     async componentDidMount() {
-        if (this.props.item_id && this.props.item_id > 0) {
+        if (this.props.item_id) {
             const data = await fetch(`http://localhost:8000/inventoryitem/${this.props.item_id}`, {
                 method: 'GET',
                 headers: {

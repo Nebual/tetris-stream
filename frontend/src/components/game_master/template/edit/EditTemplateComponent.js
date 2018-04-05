@@ -1,8 +1,13 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
 
 export class EditTemplateComponent extends React.Component{
+    static propTypes = {
+        template_id: PropTypes.string
+    }
+
     constructor(props) {
         super(props)
         this.state = {
@@ -22,7 +27,7 @@ export class EditTemplateComponent extends React.Component{
     }
 
     async componentDidMount() {
-        if (this.props.template_id && this.props.template_id > 0) {
+        if (this.props.template_id) {
             const data = await fetch(`http://localhost:8000/item/${this.props.template_id}`, {
                 method: 'GET',
                 headers: {

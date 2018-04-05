@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import SwipeableDrawer from 'material-ui/SwipeableDrawer'
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import Divider from 'material-ui/Divider'
@@ -10,8 +11,13 @@ import ItemIcon from 'material-ui-icons/GolfCourse'
 import ContainerIcon from 'material-ui-icons/FreeBreakfast'
 
 export class MenuDrawer extends React.Component{
-
-
+    static propTypes = {
+        toggleMenu: PropTypes.func.isRequired,
+        handleChangePage: PropTypes.func.isRequired,
+        classes: PropTypes.object.isRequired,
+        isGM: PropTypes.bool.isRequired,
+        menuOpen: PropTypes.bool.isRequired
+    }
 
     render() {
 

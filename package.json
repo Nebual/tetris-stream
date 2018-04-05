@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "material-ui-icons": "^1.0.0-beta.36"
+    "material-ui-icons": "^1.0.0-beta.36",
+    "react-proptypes": "^1.0.0"
   }
 }

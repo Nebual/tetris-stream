@@ -18,8 +18,11 @@ export class InventoryManager extends React.Component {
             const bodyRect = document.body.getBoundingClientRect();
             const invRect = ReactDOM.findDOMNode(inv).getBoundingClientRect()
 
-            if (e.pageX > (invRect.left - bodyRect.x) && e.pageX < (invRect.right - bodyRect.x)
-                    && e.pageY > (invRect.top - bodyRect.y) && e.pageY < (invRect.bottom - bodyRect.y)) {
+            const pageX = e.pageX || e.changedTouches[0].pageX;
+            const pageY = e.pageY || e.changedTouches[0].pageY;
+
+            if (pageX > (invRect.left - bodyRect.x) && pageX < (invRect.right - bodyRect.x)
+                    && pageY > (invRect.top - bodyRect.y) && pageY < (invRect.bottom - bodyRect.y)) {
                 // mouse cursor is within this inventory! Lets add the item
                 const margin = inv.props.margin
 

@@ -1,0 +1,12 @@
+CREATE TABLE inventory (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL DEFAULT '',
+  width INTEGER NOT NULL,
+  height INTEGER NOT NULL
+);
+DELETE FROM inventory_item;
+ALTER TABLE inventory_item
+  ADD COLUMN inventory_id INTEGER NOT NULL REFERENCES inventory (id),
+  ADD COLUMN x INTEGER NOT NULL,
+  ADD COLUMN y INTEGER NOT NULL
+;

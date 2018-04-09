@@ -3,6 +3,7 @@ use diesel::prelude::*;
 use diesel::sql_types::{Nullable, Text, Integer};
 use DbConn;
 
+use models;
 use models::*;
 use schema::{inventory_item, template_item};
 use schema::inventory_item::dsl::*;
@@ -63,62 +64,6 @@ fn delete(conn: DbConn, item_id: i32) -> Result<status::NoContent, diesel::resul
 }
 
 
-
-use diesel::dsl::sql;
-use super::schema::inventory_item::dsl as ii;
-use super::schema::template_item::dsl as ti;
-sql_function!(coalesce, Coalesce, (x: Nullable<Text>, y: Text) -> Text);
-
-macro_rules! inventory_item_select {() => {
-    inventory_item::table
-        .inner_join(template_item::table)
-        /*
-        .select(sql("\
-            inventory_item.id, \
-            inventory_item.template_id, \
-            coalesce(inventory_item.name, template_item.name),\
-            coalesce(inventory_item.public_description, template_item.public_description),\
-            coalesce(inventory_item.mechanical_description, template_item.mechanical_description),\
-            coalesce(inventory_item.hidden_description, template_item.hidden_description),\
-            coalesce(inventory_item.price, template_item.price),\
-            coalesce(inventory_item.width, template_item.width),\
-            coalesce(inventory_item.height, template_item.height),\
-            coalesce(inventory_item.image_url, template_item.image_url)\
-         "))
-         */
-        .select((
-            ii::id,
-            ii::template_id,
-            coalesce(ii::name, ti::name),
-            coalesce(ii::public_description, ti::public_description),
-            coalesce(ii::mechanical_description, ti::mechanical_description),
-            coalesce(ii::hidden_description, ti::hidden_description),
-            ii::visible_mechanical,
-            ii::visible_private,
-            sql("coalesce(inventory_item.price, template_item.price)"),
-            sql("coalesce(inventory_item.width, template_item.width)"),
-            sql("coalesce(inventory_item.height, template_item.height)"),
-            //coalesce_i32(ii::price, 3),
-            //coalesce_i32(ii::width, 3),
-            //coalesce_i32(ii::height, 3),
-            coalesce(ii::image_url, ti::image_url),
-        ))
-        .group_by((inventory_item::id, template_item::id))
-}}
-
-impl InventoryItem {
-    pub fn load(conn: DbConn, inv_id: i32) -> QueryResult<InventoryItem> {
-        inventory_item_select!()
-            .filter(inventory_item::id.eq(inv_id))
-            .get_result(&*conn)
-    }
-    pub fn index(conn: DbConn) -> QueryResult<Vec<InventoryItem>> {
-        inventory_item_select!()
-            .get_results(&*conn)
-    }
-}
-
-
 #[cfg(test)]
 mod test {
     use super::*;
@@ -144,8 +89,11 @@ mod test {
         let mut response = client.post("/inventoryitem")
             .body(serde_json::to_string(&NewInventoryItem{
                 template_id: 9000,
+                inventory_id: 9000,
                 name: Some("test invitem 1".to_string()),
                 price: Some(56),
+                x: 2,
+                y: 2,
                 ..NewInventoryItem::default()
             }).unwrap())
             .header(ContentType::JSON)

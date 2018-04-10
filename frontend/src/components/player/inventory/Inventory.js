@@ -31,7 +31,7 @@ export class Inventory extends React.PureComponent{
         borderSize: PropTypes.number,
     }
     static defaultProps = {
-        widthTotal: 600,
+        widthTotal: window.innerWidth < 768 ? (window.innerWidth -30) : 738,
         cols: 10,
         rows: 4,
         margin: 10,

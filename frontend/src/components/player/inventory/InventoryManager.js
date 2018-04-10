@@ -26,11 +26,11 @@ export class InventoryManager extends React.Component {
                 // mouse cursor is within this inventory! Lets add the item
                 const margin = inv.props.margin
 
-                const modifiedItem = Object.assign({}, newItem, {
-                    x: Math.min(inv.props.cols - newItem.w, Math.max(0, Math.round(
+                const modifiedItem = Object.assign({}, sourceInventory.state.items.find((item) => item.i === newItem.i), newItem, {
+                    x: Math.min(inv.state.cols - newItem.w, Math.max(0, Math.round(
                         (draggedRect.left - (invRect.left + inv.props.borderSize + margin)) / (inv.getSquareSize() + margin)
                     ))),
-                    y: Math.min(inv.props.rows - newItem.h, Math.max(0, Math.round(
+                    y: Math.min(inv.state.rows - newItem.h, Math.max(0, Math.round(
                         (draggedRect.top - (invRect.top + inv.props.borderSize + margin)) / (inv.getSquareSize() + margin)
                     ))),
                 })
@@ -43,7 +43,7 @@ export class InventoryManager extends React.Component {
                 layout.splice(layout.findIndex((item) => {
                     return item.i === modifiedItem.i
                 }), 1)
-                inv.addItem(modifiedItem)
+                inv.addItem(modifiedItem, sourceInventory.props.inventoryId)
             }
         })
     }
@@ -57,8 +57,7 @@ export class InventoryManager extends React.Component {
                     ref={(ele) => {
                         this.inventories.push(ele)
                     }}
-                    prefix={inventoryId}
-                    rows={inventoryId === 'player' ? 6 : 4}
+                    inventoryId={inventoryId}
                     handleDragEnd={this.handleDragEnd}
                 />
             ))

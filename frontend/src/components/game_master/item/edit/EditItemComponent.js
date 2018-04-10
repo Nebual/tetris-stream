@@ -5,7 +5,8 @@ import TextField from 'material-ui/TextField'
 
 export class EditItemComponent extends React.Component{
     static propTypes = {
-        item_id: PropTypes.string
+        item_id: PropTypes.number,
+        inventory_id: PropTypes.number,
     }
 
     constructor(props) {
@@ -39,11 +40,14 @@ export class EditItemComponent extends React.Component{
             const payload = {
                 id: item.id || 0,
                 template_id: item.template_id,
+                inventory_id: this.props.inventory_id,
                 name: item.name || '',
                 public_description: item.public_description || '',
                 mechanical_description: item.mechanical_description || '',
                 hidden_description: item.hidden_description || '',
                 price: item.price || 0,
+                x: 0,
+                y: 0,
                 width: item.width || 0,
                 height: item.height || 0,
                 image_url: item.image_url || ''
@@ -65,13 +69,16 @@ export class EditItemComponent extends React.Component{
             body: JSON.stringify({
                 id: parseInt(this.state.id, 10),
                 template_id: parseInt(this.state.template_id, 10) || 0,
+                inventory_id: this.props.inventory_id,
                 name: this.state.name || '',
                 price: parseInt(this.state.price, 10) || 0,
                 public_description: this.state.public_description || '',
                 mechanical_description: this.state.mechanical_description || '',
                 hidden_description: this.state.hidden_description || '',
-                visible_mechanical: 0,
-                visible_hidden: 0,
+                visible_mechanical: false,
+                visible_hidden: false,
+                x: parseInt(this.state.x, 10),
+                y: parseInt(this.state.y, 10),
                 width: parseInt(this.state.width, 10) || 1,
                 height: parseInt(this.state.height, 10) || 1,
                 image_url: this.state.image_url || ''
@@ -150,6 +157,18 @@ export class EditItemComponent extends React.Component{
                     name="height"
                     multiline label="Height"
                     value={this.state.height}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    name="x"
+                    multiline label="X"
+                    value={this.state.x}
+                    onChange={this.handleChange}
+                /><br/>
+                <TextField
+                    name="y"
+                    multiline label="Y"
+                    value={this.state.y}
                     onChange={this.handleChange}
                 /><br/>
                 <TextField

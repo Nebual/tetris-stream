@@ -9,7 +9,7 @@ import '../../../resize-styles.css'
  * Given two layoutitems, check if they collide.
  */
 function collides(l1, l2) {
-    if (l1 === l2) return false; // same element
+    if (l1.i === l2.i) return false; // same element
     if (l1.x + l1.w <= l2.x) return false; // l1 is left of l2
     if (l1.x >= l2.x + l2.w) return false; // l1 is right of l2
     if (l1.y + l1.h <= l2.y) return false; // l1 is above l2
@@ -25,38 +25,53 @@ function getAllCollisions(layout, layoutItem) {
 export class Inventory extends React.PureComponent{
     static propTypes = {
         widthTotal: PropTypes.number,
-        cols: PropTypes.number,
-        rows: PropTypes.number,
         margin: PropTypes.number,
         borderSize: PropTypes.number,
+        inventoryId: PropTypes.number,
     }
     static defaultProps = {
         widthTotal: 600,
-        cols: 10,
-        rows: 4,
         margin: 10,
         borderSize: 15,
     }
 
     constructor(props) {
         super(props)
-        let savedItems
-        try {
-            savedItems = JSON.parse(localStorage.getItem('inventory-' + this.props.prefix))
-        } catch (e) {}
         this.state = {
-            items: savedItems || [
-                {i: this.props.prefix + 'a', x: 3, y: 3, w: 1, h: 1},
-                {i: this.props.prefix + 'b', x: 3, y: 0, w: 2, h: 3},
-                {i: this.props.prefix + 'c', x: 0, y: 0, w: 3, h: 4},
-                {i: this.props.prefix + 'd', x: 4, y: 3, w: 1, h: 1}
-            ]
+            items: [],
+            cols: 10,
+            rows: 0,
         }
 
         this.removeItem = this.removeItem.bind(this)
         this.addItem = this.addItem.bind(this)
         this.getAllCollisionsWithItem = this.getAllCollisionsWithItem.bind(this)
         this.onLayoutChange = this.onLayoutChange.bind(this)
+        this.tellServerAboutMove = this.tellServerAboutMove.bind(this)
+    }
+
+    async componentDidMount() {
+        let response = await fetch(`http://localhost:8000/inventory/${this.props.inventoryId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        if (response.ok) {
+            let json = await response.json()
+            this.setState({
+                cols: json.width,
+                rows: json.height,
+                items: json.items.map((row) => {
+                    row.i = row.id.toString()
+                    row.w = row.width
+                    row.h = row.height
+                    return row
+                })
+            })
+        } else {
+            console.log("Inventory fetch failed")
+        }
     }
 
     // Warning: this doesn't seem to work inside onDragStop, due to https://github.com/STRML/react-grid-layout/pull/733
@@ -67,7 +82,8 @@ export class Inventory extends React.PureComponent{
             })
         })
     }
-    addItem(newItem) {
+    addItem(newItem, sourceInventoryId) {
+        this.tellServerAboutMove(newItem, sourceInventoryId, this.state.items.slice())
         this.setState({
             items: this.state.items.concat(newItem)
         })
@@ -77,26 +93,64 @@ export class Inventory extends React.PureComponent{
     }
 
     getSquareSize() {
-        return (this.props.widthTotal - (this.props.cols - 1)*this.props.margin) / this.props.cols
+        return (this.props.widthTotal - (this.state.cols - 1)*this.props.margin) / this.state.cols
     }
 
     onLayoutChange(layout) {
-        console.log(`${this.props.prefix} layout changed`, layout)
+        console.log(`${this.props.inventoryId} layout changed`, layout.length, this.state.items, layout)
         if (layout !== this.state.items) {
-            localStorage.setItem('inventory-' + this.props.prefix, JSON.stringify(layout))
-            this.setState({items: layout})
+            const oldState = this.state.items.slice()
+            const oldStateObject = oldState
+                .reduce((acc, cur) => {
+                    acc[cur.i] = cur
+                    return acc
+                }, {})
+            this.setState({
+                items: layout.map((item) => {
+                    if (!oldStateObject[item.i]) { // new item
+                        console.log("This branch isn't hit, due to how state flows through the grid layout", item)
+                        return item
+                    } else {
+                        if (oldStateObject[item.i].x !== item.x || oldStateObject[item.i].y !== item.y) {
+                            this.tellServerAboutMove(item, this.props.inventoryId, oldState)
+                        }
+                        return Object.assign({}, oldStateObject[item.i], item)
+                    }
+                })
+            })
+
         }
+    }
+
+    tellServerAboutMove(item, sourceInventoryId, oldState) {
+        fetch(`http://localhost:8000/inventory/${this.props.inventoryId}/items/move`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                inventory_item_id: parseInt(item.i, 10),
+                source_inventory_id: sourceInventoryId,
+                x: parseInt(item.x, 10),
+                y: parseInt(item.y, 10),
+            }),
+        }).then((response) => {
+            if (!response.ok) {
+                console.log("Server didn't like our move, reverting", oldState)
+                this.setState({items: oldState})
+            }
+        })
     }
 
     render() {
         const gridStyle = {
             width: this.props.widthTotal,
-            height: this.props.rows * (this.getSquareSize() + this.props.margin) - this.props.margin
+            height: this.state.rows * (this.getSquareSize() + this.props.margin) - this.props.margin
         }
         return (
             <GridLayout
                 style={gridStyle}
-                cols={this.props.cols}
+                cols={this.state.cols}
                 margin={[this.props.margin, this.props.margin]}
                 rowHeight={this.getSquareSize()}
                 width={this.props.widthTotal}
@@ -105,12 +159,13 @@ export class Inventory extends React.PureComponent{
                 isResizable={false}
                 preventCollision={true}
                 autoSize={false}
-                maxRows={this.props.rows}
+                maxRows={this.state.rows}
+                layout={this.state.items}
                 onDragStop={(layout, oldItem, newItem, _, e, ele) => {this.props.handleDragEnd(layout, oldItem, newItem, e, ele, this)}}
                 onLayoutChange={this.onLayoutChange}
             >
                 {this.state.items.map(item => (
-                    <div className="item" key={item.i} data-grid={item}>{item.name}</div>
+                    <div className="item" key={item.i}>{item.name}</div>
                 ))}
             </GridLayout>
         )

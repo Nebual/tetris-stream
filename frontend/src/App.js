@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 
 import './App.css'
 import { withStyles } from 'material-ui/styles'
+import Button from 'material-ui/Button'
 
 import {MenuBar} from './components/common/MenuBar'
 import {MenuDrawer} from './components/common/MenuDrawer'
@@ -25,12 +26,14 @@ class App extends Component {
 
         const current_page = localStorage.getItem('current_page')
 		const template_id = localStorage.getItem('template_id')
-		const item_id = localStorage.getItem('item_id')
+		const item_id = parseInt(localStorage.getItem('item_id'), 10)
 
 		this.state = {
             mode: current_page || 'INVENTORY',
 			template_id: template_id || null,
 			item_id: item_id || null,
+			currentInventoryId: 0,
+			inventories: JSON.parse(localStorage.getItem('openInventories')) || [],
             menu: {
 			    open: false,
                 isGM: true
@@ -41,6 +44,26 @@ class App extends Component {
         this.handleChangeTemplate = this.handleChangeTemplate.bind(this)
 		this.handleChangeInventoryItem = this.handleChangeInventoryItem.bind(this)
         this.getPageContents = this.getPageContents.bind(this)
+		this.createSampleCrate = this.createSampleCrate.bind(this)
+
+		this.state.currentInventoryId = parseInt(localStorage.getItem('currentPlayerInventory'), 10)
+		if (!this.state.currentInventoryId) {
+			fetch(`http://localhost:8000/inventory`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					'name': 'no-name',
+					'width': 10,
+					'height': 8,
+				})
+			}).then((response) => {
+				return response.json();
+			}).then((json) => {
+				this.setState({currentInventoryId: json.id})
+			})
+		}
 	}
 
 	toggleMenu = (open) => () => {
@@ -70,6 +93,65 @@ class App extends Component {
         }
 	}
 
+	async createSampleCrate() {
+		let crateResponse = await fetch("http://localhost:8000/inventory", {
+			method: "POST",
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				'name': 'A Box',
+				'width': 10,
+				'height': 4,
+			})
+		})
+		let inventoryId = (await crateResponse.json()).id;
+
+		await Promise.all(
+			[
+				{name: "CrateA", width: 2, height: 3, x: 0, y: 0},
+				{name: "CrateB", width: 1, height: 1, x: 0, y: 3},
+				{name: "CrateC", width: 1, height: 1, x: 1, y: 3},
+				{name: "CrateD", width: 1, height: 4, x: 2, y: 0},
+			].map((item) => {
+				return fetch("http://localhost:8000/inventoryitem", {
+					method: "POST",
+					body: JSON.stringify({
+						template_id: parseInt(item.template_id, 10) || 9000,
+						inventory_id: inventoryId,
+						name: item.name || '',
+						price: parseInt(item.price, 10) || 0,
+						public_description: item.public_description || '',
+						mechanical_description: item.mechanical_description || '',
+						hidden_description: item.hidden_description || '',
+						visible_mechanical: false,
+						visible_hidden: false,
+						x: parseInt(item.x, 10),
+						y: parseInt(item.y, 10),
+						width: parseInt(item.width, 10) || 1,
+						height: parseInt(item.height, 10) || 1,
+						image_url: item.image_url || ''
+					}),
+					headers: {
+						'Content-Type': 'application/json',
+					}
+				}).then(response => {
+					return response.json()
+				})
+			})
+		)
+		this.setState({inventories: this.state.inventories.concat(inventoryId)})
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (prevState.inventories !== this.state.inventories) {
+			localStorage.setItem("openInventories", JSON.stringify(this.state.inventories))
+		}
+		if (prevState.currentInventoryId !== this.state.currentInventoryId) {
+			localStorage.setItem('currentPlayerInventory', this.state.currentInventoryId)
+		}
+	}
+
     getPageContents () {
         switch (this.state.mode) {
 			case 'CHARACTER_SELECT':
@@ -77,7 +159,7 @@ class App extends Component {
             case 'INVENTORY':
                 return (
                     <InventoryManager
-                        inventoryIds={['player', 'chest']}
+                        inventoryIds={this.state.inventories.concat(this.state.currentInventoryId)}
                     />
                 )
 			case 'LIST_GAMES':
@@ -101,6 +183,7 @@ class App extends Component {
                 return (
                 	<EditItemComponent
 						item_id={this.state.item_id}
+						inventory_id={this.state.currentInventoryId}
 					/>
 				)
 			case 'LIST_ITEMS':
@@ -114,7 +197,14 @@ class App extends Component {
                 console.log("Invalid mode: " + this.state.mode)
             	// noinspection FallThroughInSwitchStatementJS
 			case 'LIST_CONTAINERS':
-				return null
+				return (
+					<Button
+						variant="raised"
+						onClick={this.createSampleCrate}
+					>
+						Create a Crate
+					</Button>
+				)
         }
 	}
 

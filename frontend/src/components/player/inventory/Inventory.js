@@ -46,7 +46,7 @@ export class Inventory extends React.PureComponent{
         handleClose: PropTypes.func.isRequired,
     }
     static defaultProps = {
-        widthTotal: 600,
+        widthTotal: window.innerWidth < 768 ? (window.innerWidth -30) : 738,
         margin: 10,
         isPrimary: false,
         borderSize: 15,

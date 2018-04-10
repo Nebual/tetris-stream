@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Button from 'material-ui/Button'
 import AppBar from 'material-ui/AppBar'
 import Toolbar from 'material-ui/Toolbar'
@@ -7,6 +8,12 @@ import IconButton from 'material-ui/IconButton'
 import MenuIcon from 'material-ui-icons/Menu'
 
 export class MenuBar extends React.Component{
+    static propTypes = {
+        toggleMenu: PropTypes.func.isRequired,
+        classes: PropTypes.object.isRequired,
+        page: PropTypes.string.isRequired
+    }
+
     render() {
 
         const pageTitles = {

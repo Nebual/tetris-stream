@@ -6,7 +6,7 @@ import { withStyles } from 'material-ui/styles'
 import {MenuBar} from './components/common/MenuBar'
 import {MenuDrawer} from './components/common/MenuDrawer'
 
-import {Inventory} from './components/player/inventory/inventory'
+import {InventoryManager} from './components/player/inventory/InventoryManager'
 import {ListTemplateComponent} from './components/game_master/template/list/ListTemplateComponent'
 import {EditTemplateComponent} from './components/game_master/template/edit/EditTemplateComponent'
 import {ListItemComponent} from './components/game_master/item/list/ListItemComponent'
@@ -25,10 +25,12 @@ class App extends Component {
 
         const current_page = localStorage.getItem('current_page')
 		const template_id = localStorage.getItem('template_id')
+		const item_id = localStorage.getItem('item_id')
 
 		this.state = {
             mode: current_page || 'INVENTORY',
 			template_id: template_id || null,
+			item_id: item_id || null,
             menu: {
 			    open: false,
                 isGM: true
@@ -37,6 +39,7 @@ class App extends Component {
 		this.toggleMenu = this.toggleMenu.bind(this)
         this.handleChangePage = this.handleChangePage.bind(this)
         this.handleChangeTemplate = this.handleChangeTemplate.bind(this)
+		this.handleChangeInventoryItem = this.handleChangeInventoryItem.bind(this)
         this.getPageContents = this.getPageContents.bind(this)
 	}
 
@@ -60,12 +63,23 @@ class App extends Component {
         }
     }
 
+    handleChangeInventoryItem(newItem) {
+        if (this.state.item_id !== newItem) {
+            this.setState({item_id: newItem})
+            localStorage.setItem('item_id', newItem)
+        }
+	}
+
     getPageContents () {
         switch (this.state.mode) {
 			case 'CHARACTER_SELECT':
 				return null
             case 'INVENTORY':
-                return ( <Inventory /> )
+                return (
+                    <InventoryManager
+                        inventoryIds={['player', 'chest']}
+                    />
+                )
 			case 'LIST_GAMES':
 				return null
 			case 'LIST_PLAYERS':
@@ -84,12 +98,21 @@ class App extends Component {
 					/>
 				)
             case 'EDIT_ITEM':
-                return ( <EditItemComponent /> )
+                return (
+                	<EditItemComponent
+						item_id={this.state.item_id}
+					/>
+				)
 			case 'LIST_ITEMS':
-				return ( <ListItemComponent />)
+				return (
+					<ListItemComponent
+                        handleChangePage={this.handleChangePage}
+                        handleChangeInventoryItem={this.handleChangeInventoryItem}
+					/>
+				)
             default:
                 console.log("Invalid mode: " + this.state.mode)
-            // noinspection FallThroughInSwitchStatementJS
+            	// noinspection FallThroughInSwitchStatementJS
 			case 'LIST_CONTAINERS':
 				return null
         }

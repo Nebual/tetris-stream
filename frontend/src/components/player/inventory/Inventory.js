@@ -36,6 +36,7 @@ export class Inventory extends React.PureComponent{
         rows: 4,
         margin: 10,
         borderSize: 15,
+        tileSize: 51
     }
 
     constructor(props) {
@@ -110,7 +111,9 @@ export class Inventory extends React.PureComponent{
                 onLayoutChange={this.onLayoutChange}
             >
                 {this.state.items.map(item => (
-                    <div className="item" key={item.i} data-grid={item}>{item.name}</div>
+                    <div className="item" key={item.i} data-grid={item}>{
+                        <img className="inventory-item-image" width={item.w * this.props.tileSize} height={item.y * this.props.tileSize} src="https://vignette.wikia.nocookie.net/elderscrolls/images/5/58/SteelWarAxe_SK.png/revision/latest?cb=20121012193001"/>
+                    }</div>
                 ))}
             </GridLayout>
         )

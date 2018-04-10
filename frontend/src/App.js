@@ -119,10 +119,10 @@ class App extends Component {
 
 		await Promise.all(
 			[
-				{name: "CrateA", width: 2, height: 3, x: 0, y: 0},
-				{name: "CrateB", width: 1, height: 1, x: 0, y: 3},
-				{name: "CrateC", width: 1, height: 1, x: 1, y: 3},
-				{name: "CrateD", width: 1, height: 4, x: 2, y: 0},
+				{name: "CrateA", width: 2, height: 3, x: 0, y: 0, image_url: 'http://nebtown.info/s/2Y1.png'},
+				{name: "CrateB", width: 1, height: 1, x: 0, y: 3, image_url: 'http://nebtown.info/s/2XZ.png'},
+				{name: "CrateC", width: 1, height: 1, x: 1, y: 3, image_url: 'http://nebtown.info/s/2XZ.png'},
+				{name: "CrateD", width: 1, height: 4, x: 2, y: 0, image_url: 'http://nebtown.info/s/2Y0.png'},
 			].map((item) => {
 				return fetchApi('inventoryitem', 'POST', {
 					template_id: parseInt(item.template_id, 10) || 9000,

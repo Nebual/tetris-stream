@@ -9,7 +9,11 @@
 }
 
 .item {
-  background-color: aqua;
-  border: 1px solid slategrey;
+  background-color: rgba(200, 0, 0, 0.25);
+  border: 1px solid #340800;
   box-sizing: border-box;
+}
+
+.react-grid-item.react-grid-placeholder {
+  display: none;
 }

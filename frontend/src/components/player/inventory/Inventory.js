@@ -203,7 +203,10 @@ export class Inventory extends React.PureComponent{
                     onLayoutChange={this.onLayoutChange}
                 >
                     {this.state.items.map(item => (
-                        <div className="item" key={item.i}>{item.name}</div>
+                        <div className="item" key={item.i} style={{
+                            backgroundImage: `url('${item.image_url}')`,
+                            backgroundSize: "100% 100%",
+                        }} />
                     ))}
                 </GridLayout>
                 <InventoryMenu>

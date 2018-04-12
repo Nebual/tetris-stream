@@ -4,11 +4,11 @@ import SwipeableDrawer from 'material-ui/SwipeableDrawer'
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import Divider from 'material-ui/Divider'
 
-import AccountIcon from 'material-ui-icons/People';
-import InventoryIcon from 'material-ui-icons/BusinessCenter'
-import GameIcon from 'material-ui-icons/Casino'
-import ItemIcon from 'material-ui-icons/GolfCourse'
-import ContainerIcon from 'material-ui-icons/FreeBreakfast'
+import AccountIcon from '@material-ui/icons/People';
+import InventoryIcon from '@material-ui/icons/BusinessCenter'
+import GameIcon from '@material-ui/icons/Casino'
+import ItemIcon from '@material-ui/icons/GolfCourse'
+import ContainerIcon from '@material-ui/icons/FreeBreakfast'
 
 export class MenuDrawer extends React.Component{
     static propTypes = {

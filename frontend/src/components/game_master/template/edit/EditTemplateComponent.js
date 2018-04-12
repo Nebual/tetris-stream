@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
+import {fetchApi} from "../../../../util"
 
 export class EditTemplateComponent extends React.Component{
     static propTypes = {
@@ -28,12 +29,7 @@ export class EditTemplateComponent extends React.Component{
 
     async componentDidMount() {
         if (this.props.template_id) {
-            const data = await fetch(`http://localhost:8000/item/${this.props.template_id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
+            const data = await fetchApi(`item/${this.props.template_id}`)
             const template = await data.json()
             const payload = {
                 id: template.id || 0,
@@ -52,30 +48,23 @@ export class EditTemplateComponent extends React.Component{
 
     async saveItem(e) {
         e.preventDefault();
-        let url = 'http://localhost:8000/item';
+        let url = 'item';
         let method = 'POST';
         if (this.state.id > 0) {
             url += '/' + this.state.id;
             method = 'PATCH';
         }
-        let response = await fetch(url, {
-            method: method,
-            body: JSON.stringify({
-                id: this.state.id,
-                template_id: parseInt(this.state.template_id, 10),
-                name: this.state.name || '',
-                price: parseInt(this.state.price, 10) || 0,
-                public_description: this.state.public_description || '',
-                mechanical_description: this.state.mechanical_description || '',
-                hidden_description: this.state.hidden_description || '',
-                width: this.state.width || 1,
-                height: this.state.height || 1,
-                image_url: this.state.image_url || ''
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-            }
-
+        let response = await fetchApi(url, method, {
+            id: this.state.id,
+            template_id: parseInt(this.state.template_id, 10),
+            name: this.state.name || '',
+            price: parseInt(this.state.price, 10) || 0,
+            public_description: this.state.public_description || '',
+            mechanical_description: this.state.mechanical_description || '',
+            hidden_description: this.state.hidden_description || '',
+            width: this.state.width || 1,
+            height: this.state.height || 1,
+            image_url: this.state.image_url || '',
         });
         let json = await response.json();
         this.setState({

@@ -76,7 +76,7 @@ fn rocket(is_test: bool) -> Rocket {
         false => rocket::ignite()
     })
         .manage(build_pg_pool())
-        .attach(build_cors_fairing())
+        .attach(build_cors_fairing(env::var("FRONTEND_HOST").unwrap_or("localhost:3000".into())))
         .catch(errors![error_400, not_found, error_500])
         .mount("/", routes![index])
         .mount("/item", routes![item::index, item::search, item::get, item::create, item::update, item::delete])
@@ -84,8 +84,8 @@ fn rocket(is_test: bool) -> Rocket {
         .mount("/inventory", routes![inventory::index, inventory::get, inventory::create, inventory::get_items, inventory::update, inventory::delete, inventory::move_item])
 }
 
-fn build_cors_fairing() -> rocket_cors::Cors {
-    let (allowed_origins, failed_origins) = AllowedOrigins::some(&["http://localhost:3000"]);
+fn build_cors_fairing(host: String) -> rocket_cors::Cors {
+    let (allowed_origins, failed_origins) = AllowedOrigins::some(&[&format!("http://{}", host)]);
     assert!(failed_origins.is_empty());
     rocket_cors::Cors {
         allowed_origins: allowed_origins, //AllowedOrigins::all(),

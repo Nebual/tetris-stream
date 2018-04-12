@@ -4,6 +4,7 @@ import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Ta
 import Paper from 'material-ui/Paper'
 import Grid from 'material-ui/Grid'
 import Button from 'material-ui/Button'
+import {fetchApi} from "../../../../util"
 
 export class ListTemplateComponent extends React.Component{
     static propTypes = {
@@ -20,12 +21,7 @@ export class ListTemplateComponent extends React.Component{
     }
 
     async componentDidMount() {
-        const data = await fetch('http://localhost:8000/item', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+        const data = await fetchApi('item')
         const newItems = await data.json()
         this.setState({items: newItems})
     }

@@ -4,6 +4,7 @@ import GridLayout from 'react-grid-layout'
 
 import '../../../layout-styles.css'
 import '../../../resize-styles.css'
+import {fetchApi} from "../../../util"
 
 /**
  * Given two layoutitems, check if they collide.
@@ -51,12 +52,7 @@ export class Inventory extends React.PureComponent{
     }
 
     async componentDidMount() {
-        let response = await fetch(`http://localhost:8000/inventory/${this.props.inventoryId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+        let response = await fetchApi(`inventory/${this.props.inventoryId}`)
         if (response.ok) {
             let json = await response.json()
             this.setState({
@@ -123,17 +119,11 @@ export class Inventory extends React.PureComponent{
     }
 
     tellServerAboutMove(item, sourceInventoryId, oldState) {
-        fetch(`http://localhost:8000/inventory/${this.props.inventoryId}/items/move`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                inventory_item_id: parseInt(item.i, 10),
-                source_inventory_id: sourceInventoryId,
-                x: parseInt(item.x, 10),
-                y: parseInt(item.y, 10),
-            }),
+        fetchApi(`inventory/${this.props.inventoryId}/items/move`, 'POST', {
+            inventory_item_id: parseInt(item.i, 10),
+            source_inventory_id: sourceInventoryId,
+            x: parseInt(item.x, 10),
+            y: parseInt(item.y, 10),
         }).then((response) => {
             if (!response.ok) {
                 console.log("Server didn't like our move, reverting", oldState)

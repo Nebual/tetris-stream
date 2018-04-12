@@ -5,6 +5,8 @@ services:
         build:
             context: frontend
             dockerfile: Dockerfile.production
+            args:
+                REACT_APP_API_HOST: ${TETRIS_HOST:-localhost}:8000
         image: frontend-production
         ports:
             - "80:80"

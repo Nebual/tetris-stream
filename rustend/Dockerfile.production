@@ -23,7 +23,7 @@ COPY . /app/rustend
 RUN cargo build --release
 
 
-FROM debian:stretch
+FROM debian:stretch-slim
 WORKDIR /app/rustend
 RUN apt-get update \
 	&& apt-get install -y libpq5 --no-install-recommends

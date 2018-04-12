@@ -12,6 +12,7 @@ import {ListTemplateComponent} from './components/game_master/template/list/List
 import {EditTemplateComponent} from './components/game_master/template/edit/EditTemplateComponent'
 import {ListItemComponent} from './components/game_master/item/list/ListItemComponent'
 import {EditItemComponent} from './components/game_master/item/edit/EditItemComponent'
+import {fetchApi} from "./util"
 
 const styles = {
 	flex: {
@@ -48,16 +49,10 @@ class App extends Component {
 
 		this.state.currentInventoryId = parseInt(localStorage.getItem('currentPlayerInventory'), 10)
 		if (!this.state.currentInventoryId) {
-			fetch(`http://localhost:8000/inventory`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					'name': 'no-name',
-					'width': 10,
-					'height': 8,
-				})
+			fetchApi('inventory', 'POST', {
+				'name': 'no-name',
+				'width': 10,
+				'height': 8,
 			}).then((response) => {
 				return response.json();
 			}).then((json) => {
@@ -94,16 +89,10 @@ class App extends Component {
 	}
 
 	async createSampleCrate() {
-		let crateResponse = await fetch("http://localhost:8000/inventory", {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				'name': 'A Box',
-				'width': 10,
-				'height': 4,
-			})
+		let crateResponse = await fetchApi('inventory', 'POST', {
+			'name': 'A Box',
+			'width': 10,
+			'height': 4,
 		})
 		let inventoryId = (await crateResponse.json()).id;
 
@@ -114,27 +103,21 @@ class App extends Component {
 				{name: "CrateC", width: 1, height: 1, x: 1, y: 3},
 				{name: "CrateD", width: 1, height: 4, x: 2, y: 0},
 			].map((item) => {
-				return fetch("http://localhost:8000/inventoryitem", {
-					method: "POST",
-					body: JSON.stringify({
-						template_id: parseInt(item.template_id, 10) || 9000,
-						inventory_id: inventoryId,
-						name: item.name || '',
-						price: parseInt(item.price, 10) || 0,
-						public_description: item.public_description || '',
-						mechanical_description: item.mechanical_description || '',
-						hidden_description: item.hidden_description || '',
-						visible_mechanical: false,
-						visible_hidden: false,
-						x: parseInt(item.x, 10),
-						y: parseInt(item.y, 10),
-						width: parseInt(item.width, 10) || 1,
-						height: parseInt(item.height, 10) || 1,
-						image_url: item.image_url || ''
-					}),
-					headers: {
-						'Content-Type': 'application/json',
-					}
+				return fetchApi('inventoryitem', 'POST', {
+					template_id: parseInt(item.template_id, 10) || 9000,
+					inventory_id: inventoryId,
+					name: item.name || '',
+					price: parseInt(item.price, 10) || 0,
+					public_description: item.public_description || '',
+					mechanical_description: item.mechanical_description || '',
+					hidden_description: item.hidden_description || '',
+					visible_mechanical: false,
+					visible_hidden: false,
+					x: parseInt(item.x, 10),
+					y: parseInt(item.y, 10),
+					width: parseInt(item.width, 10) || 1,
+					height: parseInt(item.height, 10) || 1,
+					image_url: item.image_url || ''
 				}).then(response => {
 					return response.json()
 				})

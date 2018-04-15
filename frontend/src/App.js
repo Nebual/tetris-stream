@@ -31,6 +31,7 @@ class App extends Component {
 
 		this.state = {
             mode: current_page || 'INVENTORY',
+            subpage: null,
 			template_id: template_id || null,
 			item_id: item_id || null,
 			currentInventoryId: 0,
@@ -69,9 +70,18 @@ class App extends Component {
 
 	handleChangePage(newpage) {
         if (this.state.mode !== newpage) {
-            this.setState({mode: newpage})
+            this.setState({
+                mode: newpage,
+                subpage: null,
+            })
             localStorage.setItem('current_page', newpage)
         }
+    }
+
+    setSubpageText = (text) => {
+        this.setState({
+            subpage: text,
+        })
     }
 
     handleChangeTemplate(newTemplate) {
@@ -142,7 +152,9 @@ class App extends Component {
             case 'INVENTORY':
                 return (
                     <InventoryManager
-                        inventoryIds={this.state.inventories.concat(this.state.currentInventoryId)}
+                        setSubpageText={this.setSubpageText}
+                        primaryInventoryId={this.state.currentInventoryId}
+                        inventoryIds={this.state.inventories}
                     />
                 )
 			case 'LIST_GAMES':
@@ -203,6 +215,7 @@ class App extends Component {
                     classes={classes}
                     toggleMenu={this.toggleMenu}
                     page={this.state.mode}
+                    subpage={this.state.subpage}
                 />
 				<MenuDrawer
                     classes={classes}

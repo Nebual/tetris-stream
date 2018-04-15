@@ -11,7 +11,8 @@ export class MenuBar extends React.Component{
     static propTypes = {
         toggleMenu: PropTypes.func.isRequired,
         classes: PropTypes.object.isRequired,
-        page: PropTypes.string.isRequired
+        page: PropTypes.string.isRequired,
+        subpage: PropTypes.string,
     }
 
     render() {
@@ -32,11 +33,11 @@ export class MenuBar extends React.Component{
         return (
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton color="inherit" aria-label="Menu">
-                        <MenuIcon onClick={this.props.toggleMenu(true)} />
+                    <IconButton color="inherit" aria-label="Menu" onClick={this.props.toggleMenu(true)}>
+                        <MenuIcon/>
                     </IconButton>
                     <Typography variant="title" color="inherit" className={this.props.classes.flex}>
-                        {`Tetris.Stream - ${pageTitles[this.props.page] || ''}`}
+                        {`Tetris.Stream - ${pageTitles[this.props.page] || ''}`}{this.props.subpage && ` - ${this.props.subpage}`}
                     </Typography>
                     <Button color="inherit">Do Nothing</Button>
                 </Toolbar>

@@ -29,6 +29,7 @@ export class Inventory extends React.PureComponent{
         margin: PropTypes.number,
         borderSize: PropTypes.number,
         inventoryId: PropTypes.number,
+        setSubpageText: PropTypes.func,
     }
     static defaultProps = {
         widthTotal: 600,
@@ -65,6 +66,9 @@ export class Inventory extends React.PureComponent{
                     return row
                 })
             })
+            if (this.props.setSubpageText) {
+                this.props.setSubpageText(json.name)
+            }
         } else {
             console.log("Inventory fetch failed")
         }

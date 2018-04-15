@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import SwipeableDrawer from 'material-ui/SwipeableDrawer'
-import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import List, { ListItem, ListItemIcon, ListItemText, ListSubheader } from 'material-ui/List';
 import Divider from 'material-ui/Divider'
 
 import AccountIcon from '@material-ui/icons/People';
@@ -40,6 +40,7 @@ export class MenuDrawer extends React.Component{
                 <Divider />
                 {this.props.isGM ? (
                     <List>
+                        <ListSubheader>Gm Zone</ListSubheader>
                         <ListItem button onClick={() => {this.props.handleChangePage('LIST_GAMES')}}>
                             <ListItemIcon>
                                 <GameIcon />

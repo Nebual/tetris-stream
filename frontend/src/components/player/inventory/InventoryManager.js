@@ -51,7 +51,7 @@ export class InventoryManager extends React.Component {
     render() {
         this.inventories = []
         return (
-            this.props.inventoryIds.map(inventoryId => (
+            [this.props.primaryInventoryId, ...this.props.inventoryIds].map(inventoryId => (
                 <Inventory
                     key={inventoryId}
                     ref={(ele) => {
@@ -59,6 +59,7 @@ export class InventoryManager extends React.Component {
                     }}
                     inventoryId={inventoryId}
                     handleDragEnd={this.handleDragEnd}
+                    setSubpageText={this.props.primaryInventoryId === inventoryId && this.props.setSubpageText || undefined}
                 />
             ))
         )

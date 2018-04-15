@@ -2,6 +2,7 @@ table! {
     inventory (id) {
         id -> Int4,
         name -> Text,
+        class -> Text,
         width -> Int4,
         height -> Int4,
     }

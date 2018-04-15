@@ -17,6 +17,21 @@ fn index(conn: DbConn) -> QueryResult<Json<Vec<Inventory>>>
     Ok(Json(inventories))
 }
 
+#[derive(FromForm)]
+struct SearchParams {
+    class: Option<String>,
+}
+#[get("/?<params>")]
+fn search(conn: DbConn, params: SearchParams) -> QueryResult<Json<Vec<Inventory>>>
+{
+    let mut sql = inventory::table.into_boxed();
+    if let Some(class) = params.class {
+        sql = sql.filter(inventory::dsl::class.eq(class));
+    }
+    let item_request = sql.load(&*conn)?;
+    Ok(Json(item_request))
+}
+
 #[get("/<inv_id>")]
 fn get(conn: DbConn, inv_id: i32) -> Option<Json<Value>>
 {

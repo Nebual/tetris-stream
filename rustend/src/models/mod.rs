@@ -83,6 +83,7 @@ pub struct NewInventoryItem {
 pub struct Inventory {
     pub id: i32,
     pub name: String,
+    pub class: String,
     pub width: i32,
     pub height: i32,
 }
@@ -91,6 +92,7 @@ pub struct Inventory {
 #[table_name = "inventory"]
 pub struct NewInventory {
     pub name: Option<String>,
-    pub width: i32,
-    pub height: i32,
+    pub class: Option<String>,
+    pub width: Option<i32>,
+    pub height: Option<i32>,
 }

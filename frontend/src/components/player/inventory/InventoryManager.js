@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Inventory} from "./Inventory"
 
-export class InventoryManager extends React.Component {
+export class InventoryManager extends React.PureComponent {
     constructor(props) {
         super(props)
 
@@ -11,7 +11,7 @@ export class InventoryManager extends React.Component {
 
     handleDragEnd(layout, oldItem, newItem, e, draggedElement, sourceInventory) {
         const draggedRect = draggedElement.getBoundingClientRect()
-        this.inventories.forEach((inv) => {
+        Object.values(this.refs).forEach((inv) => {
             if (inv === sourceInventory) {
                 return
             }
@@ -44,19 +44,17 @@ export class InventoryManager extends React.Component {
                     return item.i === modifiedItem.i
                 }), 1)
                 inv.addItem(modifiedItem, sourceInventory.props.inventoryId)
+                return false;
             }
         })
     }
 
     render() {
-        this.inventories = []
         return (
             [this.props.primaryInventoryId, ...this.props.inventoryIds].map(inventoryId => (
                 <Inventory
                     key={inventoryId}
-                    ref={(ele) => {
-                        this.inventories.push(ele)
-                    }}
+                    ref={inventoryId}
                     inventoryId={inventoryId}
                     handleDragEnd={this.handleDragEnd}
                     setSubpageText={this.props.primaryInventoryId === inventoryId && this.props.setSubpageText || undefined}

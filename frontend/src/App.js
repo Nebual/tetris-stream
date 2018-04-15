@@ -13,6 +13,7 @@ import {EditTemplateComponent} from './components/game_master/template/edit/Edit
 import {ListItemComponent} from './components/game_master/item/list/ListItemComponent'
 import {EditItemComponent} from './components/game_master/item/edit/EditItemComponent'
 import {fetchApi} from "./util"
+import {CharacterSelect} from "./components/player/characters/CharacterSelect"
 
 const styles = {
 	flex: {
@@ -98,6 +99,12 @@ class App extends Component {
         }
 	}
 
+    handleChangeCharacter = (id) => {
+        this.setState({
+            currentInventoryId: id,
+        })
+    }
+
 	async createSampleCrate() {
 		let crateResponse = await fetchApi('inventory', 'POST', {
 			'name': 'A Box',
@@ -147,8 +154,13 @@ class App extends Component {
 
     getPageContents () {
         switch (this.state.mode) {
-			case 'CHARACTER_SELECT':
-				return null
+            case 'CHARACTER_SELECT':
+                return (
+                    <CharacterSelect
+                        handleChangePage={this.handleChangePage}
+                        handleCharacterSelect={this.handleChangeCharacter}
+                    />
+                )
             case 'INVENTORY':
                 return (
                     <InventoryManager

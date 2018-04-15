@@ -81,7 +81,7 @@ fn rocket(is_test: bool) -> Rocket {
         .mount("/", routes![index])
         .mount("/item", routes![item::index, item::search, item::get, item::create, item::update, item::delete])
         .mount("/inventoryitem", routes![inventoryitem::index, inventoryitem::get, inventoryitem::create, inventoryitem::update, inventoryitem::delete])
-        .mount("/inventory", routes![inventory::index, inventory::get, inventory::create, inventory::get_items, inventory::update, inventory::delete, inventory::move_item])
+        .mount("/inventory", routes![inventory::index, inventory::search, inventory::get, inventory::create, inventory::get_items, inventory::update, inventory::delete, inventory::move_item])
 }
 
 fn build_cors_fairing(host: String) -> rocket_cors::Cors {

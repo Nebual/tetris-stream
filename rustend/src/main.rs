@@ -17,6 +17,7 @@ use rocket_cors::{AllowedOrigins, AllowedHeaders, AllowedMethods};
 
 #[macro_use]
 extern crate diesel;
+#[macro_use] extern crate diesel_migrations;
 
 use std::env;
 
@@ -96,9 +97,15 @@ fn build_cors_fairing(host: String) -> rocket_cors::Cors {
     }
 }
 
+embed_migrations!();
 fn build_pg_pool() -> pg_pool::Pool {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    pg_pool::init_pool(database_url)
+    let pool = pg_pool::init_pool(database_url);
+
+    let connection = pool.get().unwrap();
+    embedded_migrations::run(&connection).unwrap();
+    embedded_migrations::run_with_output(&connection, &mut std::io::stdout()).unwrap();
+    return pool;
 }
 
 #[cfg(test)]

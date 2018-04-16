@@ -13,8 +13,6 @@ RUN set -eux; \
 
 RUN wget -q https://github.com/krallin/tini/releases/download/v0.17.0/tini -O /tini && chmod +x /tini
 
-RUN cargo install diesel_cli --no-default-features --features postgres
-
 # Rust libraries
 WORKDIR /app/rustend
 COPY Cargo.toml Cargo.lock /app/rustend/
@@ -30,12 +28,8 @@ WORKDIR /app/rustend
 RUN apt-get update \
 	&& apt-get install -y libpq5 --no-install-recommends
 COPY start.production.sh wait-for-it.sh Rocket.toml Cargo.toml /app/rustend/
-COPY migrations /app/rustend/migrations
 COPY --from=0 /tini /tini
-COPY --from=0 /usr/local/cargo/bin/diesel /usr/bin/diesel
 COPY --from=0 /app/rustend/target/release/tetris-stream /app/rustend/tetris-stream
-
-EXPOSE 8000
 
 ENTRYPOINT ["/tini", "--"]
 CMD ["/app/rustend/start.production.sh"]

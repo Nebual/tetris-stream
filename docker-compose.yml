@@ -6,12 +6,14 @@ services:
             context: frontend
         container_name: "frontend"
         image: frontend
+        links:
+            - rustend
         tmpfs:
             - /tmp
         environment:
             PORT: 80
             HOST: 0.0.0.0
-            REACT_APP_API_HOST: ${TETRIS_HOST:-localhost}:8000
+            REACT_APP_API_HOST: http://localhost:8000
     rustend:
         build:
             context: rustend
@@ -24,7 +26,7 @@ services:
         environment:
             DATABASE_URL: postgres://postgres:supersecretpassword2@db/rustydb
             CARGO_INCREMENTAL: 1
-            FRONTEND_HOST: ${TETRIS_HOST:-localhost}:3000
+            FRONTEND_HOST: http://localhost:3000
         tmpfs:
             - /tmp
     db:

@@ -6,10 +6,11 @@ services:
             context: frontend
             dockerfile: Dockerfile.production
             args:
-                REACT_APP_API_HOST: ${TETRIS_HOST:-localhost}:8000
+                PUBLIC_URL: ${TETRIS_HOST:-http://127.0.0.1}
+                REACT_APP_API_HOST: ${TETRIS_HOST:-http://127.0.0.1}/api
         image: frontend-production
         ports:
-            - "80:80"
+            - "${TETRIS_WEB_PORT:-80}:80"
         environment:
             - PRODUCTION=true
     rustend:
@@ -19,3 +20,4 @@ services:
         image: rustend-production
         environment:
             - ROCKET_ENV=staging
+            - FRONTEND_HOST=${TETRIS_HOST:-http://127.0.0.1}

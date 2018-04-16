@@ -5,18 +5,20 @@ ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH
 RUN set -eux; \
-    wget "https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
+    wget -q "https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
     chmod +x rustup-init; \
     ./rustup-init -y --no-modify-path --default-toolchain nightly; \
     rm rustup-init; \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME;
+
+RUN wget -q https://github.com/krallin/tini/releases/download/v0.17.0/tini -O /tini && chmod +x /tini
 
 RUN cargo install diesel_cli --no-default-features --features postgres
 
 # Rust libraries
 WORKDIR /app/rustend
 COPY Cargo.toml Cargo.lock /app/rustend/
-RUN mkdir src target && touch src/lib.rs && cargo build --lib && rm -rf src
+RUN mkdir src target && touch src/lib.rs && cargo build --lib --release && rm -rf src
 
 # Rust build
 COPY . /app/rustend
@@ -27,10 +29,13 @@ FROM debian:stretch-slim
 WORKDIR /app/rustend
 RUN apt-get update \
 	&& apt-get install -y libpq5 --no-install-recommends
-COPY wait-for-it.sh Rocket.toml Cargo.toml /app/rustend/
+COPY start.production.sh wait-for-it.sh Rocket.toml Cargo.toml /app/rustend/
+COPY migrations /app/rustend/migrations
+COPY --from=0 /tini /tini
 COPY --from=0 /usr/local/cargo/bin/diesel /usr/bin/diesel
 COPY --from=0 /app/rustend/target/release/tetris-stream /app/rustend/tetris-stream
 
 EXPOSE 8000
 
-CMD /app/rustend/wait-for-it.sh db:5432 -q -- diesel setup && /app/rustend/tetris-stream
+ENTRYPOINT ["/tini", "--"]
+CMD ["/app/rustend/start.production.sh"]

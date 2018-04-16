@@ -85,7 +85,7 @@ fn rocket(is_test: bool) -> Rocket {
 }
 
 fn build_cors_fairing(host: String) -> rocket_cors::Cors {
-    let (allowed_origins, failed_origins) = AllowedOrigins::some(&[&format!("http://{}", host)]);
+    let (allowed_origins, failed_origins) = AllowedOrigins::some(&[&host]);
     assert!(failed_origins.is_empty());
     rocket_cors::Cors {
         allowed_origins: allowed_origins, //AllowedOrigins::all(),

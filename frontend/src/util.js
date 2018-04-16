@@ -8,5 +8,5 @@ export function fetchApi(endpoint, method, body, options) {
 	if (body) {
 		options.body = JSON.stringify(body)
 	}
-	return fetch(`http://${API_URL}/${endpoint}`, options)
+	return fetch(`${API_URL}/${endpoint}`, options)
 }

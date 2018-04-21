@@ -5,6 +5,8 @@ import GridLayout from 'react-grid-layout'
 import '../../../layout-styles.css'
 import '../../../resize-styles.css'
 import {fetchApi} from "../../../util"
+import IconButton from 'material-ui/IconButton'
+import MenuIcon from '@material-ui/icons/Menu'
 
 /**
  * Given two layoutitems, check if they collide.
@@ -142,26 +144,42 @@ export class Inventory extends React.PureComponent{
             height: this.state.rows * (this.getSquareSize() + this.props.margin) - this.props.margin
         }
         return (
-            <GridLayout
-                style={gridStyle}
-                cols={this.state.cols}
-                margin={[this.props.margin, this.props.margin]}
-                rowHeight={this.getSquareSize()}
-                width={this.props.widthTotal}
-                compactType={null}
-                containerPadding={[0,0]}
-                isResizable={false}
-                preventCollision={true}
-                autoSize={false}
-                maxRows={this.state.rows}
-                layout={this.state.items}
-                onDragStop={(layout, oldItem, newItem, _, e, ele) => {this.props.handleDragEnd(layout, oldItem, newItem, e, ele, this)}}
-                onLayoutChange={this.onLayoutChange}
-            >
-                {this.state.items.map(item => (
-                    <div className="item" key={item.i}>{item.name}</div>
-                ))}
-            </GridLayout>
+            <div style={{
+                width: gridStyle.width + 15 * 2,
+                height: gridStyle.height + 15 * 2,
+                margin: "0 auto",
+                position: "relative",
+            }}>
+                <GridLayout
+                    style={gridStyle}
+                    cols={this.state.cols}
+                    margin={[this.props.margin, this.props.margin]}
+                    rowHeight={this.getSquareSize()}
+                    width={this.props.widthTotal}
+                    compactType={null}
+                    containerPadding={[0, 0]}
+                    isResizable={false}
+                    preventCollision={true}
+                    autoSize={false}
+                    maxRows={this.state.rows}
+                    layout={this.state.items}
+                    onDragStop={(layout, oldItem, newItem, _, e, ele) => {
+                        this.props.handleDragEnd(layout, oldItem, newItem, e, ele, this)
+                    }}
+                    onLayoutChange={this.onLayoutChange}
+                >
+                    {this.state.items.map(item => (
+                        <div className="item" key={item.i}>{item.name}</div>
+                    ))}
+                </GridLayout>
+                <IconButton color="inherit" aria-label="Menu" onClick={() => {
+                    console.log("B")
+                }}
+                            style={{position: 'absolute', top: 0, right: '100%', zIndex: 5}}
+                >
+                    <MenuIcon/>
+                </IconButton>
+            </div>
         )
     }
 }

@@ -6,6 +6,8 @@ import '../../../layout-styles.css'
 import '../../../resize-styles.css'
 import {fetchApi} from "../../../util"
 
+import interval from 'interval-promise'
+
 import styled from "../../../utils/styled"
 import MenuItem from "material-ui/Menu/MenuItem"
 import InventoryMenu from "./InventoryMenu"
@@ -68,6 +70,19 @@ export class Inventory extends React.PureComponent{
 
     async componentDidMount() {
         await this.refreshInventory()
+
+        // the dirtiest of quick hacks
+        if (!this.props.isPrimary) {
+            interval(async (iteration, stop) => {
+                if (this._destroyed) {
+                    return stop()
+                }
+                await this.refreshInventory()
+            }, 1000)
+        }
+    }
+    componentWillUnmount() {
+        this._destroyed = true;
     }
 
     refreshInventory = async () => {

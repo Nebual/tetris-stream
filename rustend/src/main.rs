@@ -93,6 +93,7 @@ fn build_cors_fairing(host: String) -> rocket_cors::Cors {
         //allowed_methods: vec![Method::Get, Method::Post].into_iter().map(From::from).collect(),
         //allowed_headers: AllowedHeaders::some(&["Authorization", "Accept"]),
         allow_credentials: true,
+        max_age: Some(600),
         ..Default::default()
     }
 }

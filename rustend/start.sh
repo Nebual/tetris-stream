@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+# Launch proxy between outside port 80, and the server's port 81, so requests made while server is restarting wait instead of failing
+socat TCP-LISTEN:80,fork TCP:localhost:81,retry=10 &
+
 touch .trigger-successful-build
 cargo watch -x check --postpone -s "touch .trigger-successful-build && echo '' && echo ''" &
 ./wait-for-it.sh db:5432 -q -- \

@@ -6,7 +6,7 @@ import '../../../layout-styles.css'
 import '../../../resize-styles.css'
 import {fetchApi} from "../../../util"
 
-import interval from 'interval-promise'
+import interval from '../../../utils/interval-promise'
 
 import styled from "../../../utils/styled"
 import MenuItem from "material-ui/Menu/MenuItem"

@@ -57,6 +57,8 @@ export class InventoryManager extends React.PureComponent {
                     ref={inventoryId}
                     inventoryId={inventoryId}
                     handleDragEnd={this.handleDragEnd}
+                    handleClose={this.props.handleClose}
+                    isPrimary={this.props.primaryInventoryId === inventoryId}
                     setSubpageText={this.props.primaryInventoryId === inventoryId && this.props.setSubpageText || undefined}
                 />
             ))

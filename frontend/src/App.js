@@ -105,6 +105,10 @@ class App extends Component {
         })
     }
 
+    handleCloseInventory = (inventoryId) => {
+        this.setState({inventories: this.state.inventories.filter(id => id !== inventoryId)})
+    }
+
 	async createSampleCrate() {
 		let crateResponse = await fetchApi('inventory', 'POST', {
 			'name': 'A Box',
@@ -167,6 +171,7 @@ class App extends Component {
                         setSubpageText={this.setSubpageText}
                         primaryInventoryId={this.state.currentInventoryId}
                         inventoryIds={this.state.inventories}
+                        handleClose={this.handleCloseInventory}
                     />
                 )
 			case 'LIST_GAMES':

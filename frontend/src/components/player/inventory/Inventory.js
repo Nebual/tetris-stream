@@ -6,6 +6,16 @@ import '../../../layout-styles.css'
 import '../../../resize-styles.css'
 import {fetchApi} from "../../../util"
 
+import styled from "../../../utils/styled"
+import MenuItem from "material-ui/Menu/MenuItem"
+import InventoryMenu from "./InventoryMenu"
+
+
+const InventoryContainer = styled('div')({
+    margin: "0 auto",
+    position: "relative",
+})
+
 /**
  * Given two layoutitems, check if they collide.
  */
@@ -29,11 +39,14 @@ export class Inventory extends React.PureComponent{
         margin: PropTypes.number,
         borderSize: PropTypes.number,
         inventoryId: PropTypes.number,
+        isPrimary: PropTypes.bool,
         setSubpageText: PropTypes.func,
+        handleClose: PropTypes.func.isRequired,
     }
     static defaultProps = {
         widthTotal: 600,
         margin: 10,
+        isPrimary: false,
         borderSize: 15,
     }
 
@@ -43,6 +56,7 @@ export class Inventory extends React.PureComponent{
             items: [],
             cols: 10,
             rows: 0,
+            inventoryTitle: '',
         }
 
         this.removeItem = this.removeItem.bind(this)
@@ -53,12 +67,17 @@ export class Inventory extends React.PureComponent{
     }
 
     async componentDidMount() {
+        await this.refreshInventory()
+    }
+
+    refreshInventory = async () => {
         let response = await fetchApi(`inventory/${this.props.inventoryId}`)
         if (response.ok) {
             let json = await response.json()
             this.setState({
                 cols: json.width,
                 rows: json.height,
+                inventoryTitle: json.name,
                 items: json.items.map((row) => {
                     row.i = row.id.toString()
                     row.w = row.width
@@ -136,32 +155,48 @@ export class Inventory extends React.PureComponent{
         })
     }
 
+    handleClose = () => {
+        this.props.handleClose(this.props.inventoryId)
+    }
+
     render() {
         const gridStyle = {
             width: this.props.widthTotal,
             height: this.state.rows * (this.getSquareSize() + this.props.margin) - this.props.margin
         }
         return (
-            <GridLayout
-                style={gridStyle}
-                cols={this.state.cols}
-                margin={[this.props.margin, this.props.margin]}
-                rowHeight={this.getSquareSize()}
-                width={this.props.widthTotal}
-                compactType={null}
-                containerPadding={[0,0]}
-                isResizable={false}
-                preventCollision={true}
-                autoSize={false}
-                maxRows={this.state.rows}
-                layout={this.state.items}
-                onDragStop={(layout, oldItem, newItem, _, e, ele) => {this.props.handleDragEnd(layout, oldItem, newItem, e, ele, this)}}
-                onLayoutChange={this.onLayoutChange}
-            >
-                {this.state.items.map(item => (
-                    <div className="item" key={item.i}>{item.name}</div>
-                ))}
-            </GridLayout>
+            <InventoryContainer style={{
+                width: gridStyle.width + this.props.borderSize * 2,
+                height: gridStyle.height + this.props.borderSize * 2,
+            }}>
+                <GridLayout
+                    style={gridStyle}
+                    cols={this.state.cols}
+                    margin={[this.props.margin, this.props.margin]}
+                    rowHeight={this.getSquareSize()}
+                    width={this.props.widthTotal}
+                    compactType={null}
+                    containerPadding={[0, 0]}
+                    isResizable={false}
+                    preventCollision={true}
+                    autoSize={false}
+                    maxRows={this.state.rows}
+                    layout={this.state.items}
+                    onDragStop={(layout, oldItem, newItem, _, e, ele) => {
+                        this.props.handleDragEnd(layout, oldItem, newItem, e, ele, this)
+                    }}
+                    onLayoutChange={this.onLayoutChange}
+                >
+                    {this.state.items.map(item => (
+                        <div className="item" key={item.i}>{item.name}</div>
+                    ))}
+                </GridLayout>
+                <InventoryMenu>
+                    <MenuItem disabled={true}>{this.state.inventoryTitle}</MenuItem>
+                    <MenuItem onClick={this.refreshInventory}>Refresh</MenuItem>
+                    {!this.props.isPrimary ? <MenuItem onClick={this.handleClose}>Close</MenuItem> : null}
+                </InventoryMenu>
+            </InventoryContainer>
         )
     }
 }

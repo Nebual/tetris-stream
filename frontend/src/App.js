@@ -178,6 +178,7 @@ class App extends Component {
                         primaryInventoryId={this.state.currentInventoryId}
                         inventoryIds={this.state.inventories}
                         handleClose={this.handleCloseInventory}
+                        handleChangeInventoryItem={this.handleChangeInventoryItem}
                     />
                 )
 			case 'LIST_GAMES':
@@ -186,23 +187,27 @@ class App extends Component {
 				return null
             case 'EDIT_TEMPLATE':
                 return (
-                	<EditTemplateComponent
-						template_id={this.state.template_id}
-					/>
+                    <EditTemplateComponent
+                        handleChangePage={this.handleChangePage}
+                        handleChangeInventoryItem={this.handleChangeInventoryItem}
+                        template_id={this.state.template_id}
+                    />
 				)
             case 'LIST_TEMPLATES':
                 return (
-                	<ListTemplateComponent
+                    <ListTemplateComponent
                         handleChangePage={this.handleChangePage}
                         handleChangeTemplate={this.handleChangeTemplate}
-					/>
+                        handleChangeInventoryItem={this.handleChangeInventoryItem}
+                    />
 				)
             case 'EDIT_ITEM':
                 return (
-                	<EditItemComponent
-						item_id={this.state.item_id}
-						inventory_id={this.state.currentInventoryId}
-					/>
+                    <EditItemComponent
+                        item_id={this.state.item_id}
+                        inventory_id={this.state.currentInventoryId}
+                        template_id={parseInt(this.state.template_id, 10)}
+                    />
 				)
 			case 'LIST_ITEMS':
 				return (

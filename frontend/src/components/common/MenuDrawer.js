@@ -65,6 +65,12 @@ export class MenuDrawer extends React.Component{
                             </ListItemIcon>
                             <ListItemText primary="Items"/>
                         </ListItem>
+                        <ListItem button onClick={() => {this.props.handleChangePage('EDIT_ITEM')}}>
+                            <ListItemIcon>
+                                <ItemIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Quick Edit Last Item"/>
+                        </ListItem>
                         <ListItem button onClick={() => {this.props.handleChangePage('LIST_CONTAINERS')}}>
                             <ListItemIcon>
                                 <ContainerIcon />

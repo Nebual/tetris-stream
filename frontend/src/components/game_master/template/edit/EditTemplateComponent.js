@@ -2,10 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
+import Paper from "material-ui/Paper"
 import {fetchApi} from "../../../../util"
 
 export class EditTemplateComponent extends React.Component{
     static propTypes = {
+        handleChangePage: PropTypes.func.isRequired,
+        handleChangeInventoryItem: PropTypes.func.isRequired,
         template_id: PropTypes.string
     }
 
@@ -23,7 +26,6 @@ export class EditTemplateComponent extends React.Component{
             image_url: ''
         }
 
-        this.saveItem = this.saveItem.bind(this)
         this.handleChange = this.handleChange.bind(this)
     }
 
@@ -46,8 +48,11 @@ export class EditTemplateComponent extends React.Component{
         }
     }
 
-    async saveItem(e) {
+    handleSubmit = async (e) => {
         e.preventDefault();
+        await this.saveItem()
+    }
+    saveItem = async () => {
         let url = 'item';
         let method = 'POST';
         if (this.state.id > 0) {
@@ -56,20 +61,25 @@ export class EditTemplateComponent extends React.Component{
         }
         let response = await fetchApi(url, method, {
             id: this.state.id,
-            template_id: parseInt(this.state.template_id, 10),
             name: this.state.name || '',
             price: parseInt(this.state.price, 10) || 0,
             public_description: this.state.public_description || '',
             mechanical_description: this.state.mechanical_description || '',
             hidden_description: this.state.hidden_description || '',
-            width: this.state.width || 1,
-            height: this.state.height || 1,
+            width: parseInt(this.state.width, 10) || 1,
+            height: parseInt(this.state.height, 10) || 1,
             image_url: this.state.image_url || '',
         });
         let json = await response.json();
         this.setState({
             id: json['id'],
         });
+    }
+
+    handleAddToItem = async () => {
+        await this.saveItem()
+        this.props.handleChangeInventoryItem(0)
+        return this.props.handleChangePage('INVENTORY')
     }
 
     handleChange(e) {
@@ -80,9 +90,8 @@ export class EditTemplateComponent extends React.Component{
 
     render() {
 
-
-        return (
-            <form onSubmit={this.saveItem}>
+        return <Paper style={{padding: '10px 0'}}>
+            <form onSubmit={this.handleSubmit}>
                 <input type="hidden" name="id" value={this.state.id} />
                 <TextField
                     type="text"
@@ -121,28 +130,42 @@ export class EditTemplateComponent extends React.Component{
                 /><br/>
                 <TextField
                     name="width"
-                    multiline label="Width"
+                    label="Width"
+                    type="number"
                     value={this.state.width}
                     onChange={this.handleChange}
                 /><br/>
                 <TextField
                     name="height"
-                    multiline label="Height"
+                    label="Height"
+                    type="number"
                     value={this.state.height}
                     onChange={this.handleChange}
                 /><br/>
                 <TextField
                     name="image_url"
-                    multiline label="Image_url"
+                    label="Image_url"
                     value={this.state.image_url}
                     onChange={this.handleChange}
-                /><br/>
+                />
+                <img src={this.state.image_url} width={48} height={48} alt="" style={{
+                    position: 'relative',
+                    top: 12,
+                    left: 64,
+                    marginTop: -12,
+                    marginLeft: -48,
+                    minWidth: 48,
+                    opacity: this.state.image_url ? 1 : 0,
+                }}/>
 
                 <br/><br/>
                 <Button variant="raised" color="primary" type="submit">
                     Save
                 </Button>
+                <Button variant="raised" color="default" type="button" onClick={this.handleAddToItem}>
+                    Add to Inventory
+                </Button>
             </form>
-        )
+        </Paper>
     }
 }

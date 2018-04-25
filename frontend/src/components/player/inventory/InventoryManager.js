@@ -1,8 +1,16 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import {Inventory} from "./Inventory"
 
 export class InventoryManager extends React.PureComponent {
+    static propTypes = {
+        setSubpageText: PropTypes.func.isRequired,
+        primaryInventoryId: PropTypes.number.isRequired,
+        inventoryIds: PropTypes.array.isRequired,
+        handleClose: PropTypes.func.isRequired,
+        handleChangeInventoryItem: PropTypes.func.isRequired,
+    }
     constructor(props) {
         super(props)
 
@@ -47,6 +55,7 @@ export class InventoryManager extends React.PureComponent {
                 return false;
             }
         })
+        this.props.handleChangeInventoryItem(newItem.i)
     }
 
     render() {
@@ -59,7 +68,7 @@ export class InventoryManager extends React.PureComponent {
                     handleDragEnd={this.handleDragEnd}
                     handleClose={this.props.handleClose}
                     isPrimary={this.props.primaryInventoryId === inventoryId}
-                    setSubpageText={this.props.primaryInventoryId === inventoryId && this.props.setSubpageText || undefined}
+                    setSubpageText={this.props.primaryInventoryId === inventoryId ? this.props.setSubpageText : undefined}
                 />
             ))
         )

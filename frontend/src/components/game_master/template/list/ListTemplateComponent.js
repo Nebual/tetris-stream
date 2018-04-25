@@ -9,7 +9,8 @@ import {fetchApi} from "../../../../util"
 export class ListTemplateComponent extends React.Component{
     static propTypes = {
         handleChangeTemplate: PropTypes.func.isRequired,
-        handleChangePage: PropTypes.func.isRequired
+        handleChangePage: PropTypes.func.isRequired,
+        handleChangeInventoryItem: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -29,6 +30,12 @@ export class ListTemplateComponent extends React.Component{
     handleEditItem(id) {
         this.props.handleChangeTemplate(id)
         return this.props.handleChangePage('EDIT_TEMPLATE')
+    }
+
+    handleAddToItem = (id) => {
+        this.props.handleChangeTemplate(id)
+        this.props.handleChangeInventoryItem(0)
+        return this.props.handleChangePage('EDIT_ITEM')
     }
 
     render(){
@@ -58,6 +65,7 @@ export class ListTemplateComponent extends React.Component{
                                         <TableCell numeric>{item.price}</TableCell>
                                         <TableCell>
                                             <Button color="primary" onClick={() => this.handleEditItem(item.id)}>Edit</Button>
+                                            <Button color="primary" onClick={() => this.handleAddToItem(item.id)}>Add to Inventory</Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}

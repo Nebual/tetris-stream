@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import Menu from "material-ui/Menu"
 import IconButton from 'material-ui/IconButton'

@@ -24,7 +24,6 @@ export class InventorySelect extends React.PureComponent {
     async componentDidMount() {
         const data = await fetchApi(`inventory?class=${this.props.inventoryClass}`)
         const newInventories = await data.json()
-        console.log(newInventories)
         this.setState({inventories: newInventories})
     }
 
@@ -86,12 +85,12 @@ export class InventorySelect extends React.PureComponent {
                                 </TableCell>
                                 <TableCell>
                                     <EditableText
-                                        onSave={(value) => this.updateInventoryProperty(row.id, 'width', parseInt(value) || row.width)}
+                                        onSave={(value) => this.updateInventoryProperty(row.id, 'width', parseInt(value, 10) || row.width)}
                                         text={row.width.toString()}/>
                                 </TableCell>
                                 <TableCell>
                                     <EditableText
-                                        onSave={(value) => this.updateInventoryProperty(row.id, 'height', parseInt(value) || row.height)}
+                                        onSave={(value) => this.updateInventoryProperty(row.id, 'height', parseInt(value, 10) || row.height)}
                                         text={row.height.toString()}/>
                                 </TableCell>
                                 <TableCell>

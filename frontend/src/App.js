@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import Immutable from 'immutable'
 
 import './App.css'
 import { withStyles } from 'material-ui/styles'
@@ -13,7 +14,7 @@ import {EditTemplateComponent} from './components/game_master/template/edit/Edit
 import {ListItemComponent} from './components/game_master/item/list/ListItemComponent'
 import {EditItemComponent} from './components/game_master/item/edit/EditItemComponent'
 import {fetchApi} from "./util"
-import {CharacterSelect} from "./components/player/characters/CharacterSelect"
+import {InventorySelect} from "./components/common/InventorySelect"
 
 const styles = {
 	flex: {
@@ -36,7 +37,7 @@ class App extends Component {
 			template_id: template_id || null,
 			item_id: item_id || null,
 			currentInventoryId: 0,
-			inventories: JSON.parse(localStorage.getItem('openInventories')) || [],
+			inventories: new Immutable.Set(JSON.parse(localStorage.getItem('openInventories')) || []),
             menu: {
 			    open: false,
                 isGM: true
@@ -52,9 +53,10 @@ class App extends Component {
 		this.state.currentInventoryId = parseInt(localStorage.getItem('currentPlayerInventory'), 10)
 		if (!this.state.currentInventoryId) {
 			fetchApi('inventory', 'POST', {
-				'name': 'no-name',
-				'width': 10,
-				'height': 8,
+                'name': 'Unnamed Player',
+                'class': 'player',
+                'width': 10,
+                'height': 4,
 			}).then((response) => {
 				return response.json();
 			}).then((json) => {
@@ -104,9 +106,12 @@ class App extends Component {
             currentInventoryId: id,
         })
     }
+    handleOpenInventory = (inventoryId) => {
+        this.setState({inventories: this.state.inventories.add(inventoryId)})
+    }
 
     handleCloseInventory = (inventoryId) => {
-        this.setState({inventories: this.state.inventories.filter(id => id !== inventoryId)})
+        this.setState({inventories: this.state.inventories.remove(inventoryId)})
     }
 
 	async createSampleCrate() {
@@ -114,6 +119,7 @@ class App extends Component {
 			'name': 'A Box',
 			'width': 10,
 			'height': 4,
+			'class': 'crate',
 		})
 		let inventoryId = (await crateResponse.json()).id;
 
@@ -144,7 +150,8 @@ class App extends Component {
 				})
 			})
 		)
-		this.setState({inventories: this.state.inventories.concat(inventoryId)})
+		this.handleOpenInventory(inventoryId)
+		this.handleChangePage('INVENTORY')
 	}
 
 	componentDidUpdate(prevProps, prevState) {
@@ -159,12 +166,11 @@ class App extends Component {
     getPageContents () {
         switch (this.state.mode) {
             case 'CHARACTER_SELECT':
-                return (
-                    <CharacterSelect
-                        handleChangePage={this.handleChangePage}
-                        handleCharacterSelect={this.handleChangeCharacter}
-                    />
-                )
+                return <InventorySelect
+                    handleChangePage={this.handleChangePage}
+                    handleInventorySelect={this.handleChangeCharacter}
+                    inventoryClass="player"
+                />
             case 'INVENTORY':
                 return (
                     <InventoryManager
@@ -209,14 +215,20 @@ class App extends Component {
                 console.log("Invalid mode: " + this.state.mode)
             	// noinspection FallThroughInSwitchStatementJS
 			case 'LIST_CONTAINERS':
-				return (
-					<Button
-						variant="raised"
-						onClick={this.createSampleCrate}
-					>
-						Create a Crate
-					</Button>
-				)
+                return <React.Fragment>
+                    <InventorySelect
+                        handleChangePage={this.handleChangePage}
+                        handleInventorySelect={this.handleOpenInventory}
+                        inventoryClass="crate"
+                    />
+                    <Button
+                        variant="raised"
+                        onClick={this.createSampleCrate}
+                        style={{marginTop: 15}}
+                    >
+                        Create a Sample Crate
+                    </Button>
+                </React.Fragment>
         }
 	}
 

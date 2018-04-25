@@ -3,43 +3,45 @@ import PropTypes from 'prop-types'
 import Table, {TableBody, TableCell, TableHead, TableRow} from 'material-ui/Table'
 import Paper from 'material-ui/Paper'
 import Button from 'material-ui/Button'
-import {fetchApi} from "../../../util"
-import {EditableText} from "../../common/EditableText"
+import {fetchApi} from "../../util"
+import {EditableText} from "./EditableText"
 
-export class CharacterSelect extends React.PureComponent {
+export class InventorySelect extends React.PureComponent {
     static propTypes = {
-        handleCharacterSelect: PropTypes.func.isRequired,
+        handleInventorySelect: PropTypes.func.isRequired,
         handleChangePage: PropTypes.func.isRequired,
+        inventoryClass: PropTypes.string.isRequired,
     }
 
     constructor(props) {
         super(props)
 
         this.state = {
-            characters: []
+            inventories: []
         }
     }
 
     async componentDidMount() {
-        const data = await fetchApi('inventory?class=player')
-        const newCharacters = await data.json()
-        this.setState({characters: newCharacters})
+        const data = await fetchApi(`inventory?class=${this.props.inventoryClass}`)
+        const newInventories = await data.json()
+        console.log(newInventories)
+        this.setState({inventories: newInventories})
     }
 
-    handleLoadCharacter = (id) => {
-        this.props.handleCharacterSelect(id)
+    handleLoadInventory = (id) => {
+        this.props.handleInventorySelect(id)
         return this.props.handleChangePage('INVENTORY')
     }
-    createNewCharacter = async () => {
+    createNewInventory = async () => {
         let response = await fetchApi('inventory', 'POST', {
-            'name': 'New Inventory',
-            'class': 'player',
+            'name': `New ${this.props.inventoryClass}`,
+            'class': this.props.inventoryClass,
             'width': 10,
             'height': 4,
         })
         let newInventory = await response.json();
         this.setState({
-            characters: this.state.characters.concat(newInventory)
+            inventories: this.state.inventories.concat(newInventory)
         })
     }
     updateInventoryProperty = async (inventoryId, name, value) => {
@@ -48,7 +50,7 @@ export class CharacterSelect extends React.PureComponent {
         })
         if (response.ok) {
             this.setState({
-                characters: this.state.characters.map((row) => {
+                inventories: this.state.inventories.map((row) => {
                     if (row.id === inventoryId) {
                         row[name] = value
                     }
@@ -69,13 +71,12 @@ export class CharacterSelect extends React.PureComponent {
                             <TableCell>Width</TableCell>
                             <TableCell>Height</TableCell>
                             <TableCell>
-                                <Button variant="raised" color="primary" onClick={this.createNewCharacter}>New
-                                    Character</Button>
+                                <Button variant="raised" color="primary" onClick={this.createNewInventory}>New</Button>
                             </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.state.characters.map(row => (
+                        {this.state.inventories.map(row => (
                             <TableRow key={row.id}>
                                 <TableCell numeric>{row.id}</TableCell>
                                 <TableCell>
@@ -96,7 +97,7 @@ export class CharacterSelect extends React.PureComponent {
                                 <TableCell>
                                     <Button
                                         color="primary"
-                                        onClick={() => this.handleLoadCharacter(row.id)}
+                                        onClick={() => this.handleLoadInventory(row.id)}
                                     >Load</Button>
                                 </TableCell>
                             </TableRow>

@@ -40,10 +40,9 @@ export default class InventoryMenu extends React.PureComponent {
             <InventoryMenuButton
                 aria-owns={anchorEl ? 'inv-menu' : null}
                 aria-haspopup="true"
+                onClick={this.handleClick}
             >
-                <MenuIcon
-                    onClick={this.handleClick}
-                />
+                <MenuIcon/>
             </InventoryMenuButton>
             <Menu
                 id="inv-menu"

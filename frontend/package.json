@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@material-ui/icons": "^1.0.0-beta",
+    "immutable": "^3.8.2",
     "material-ui": "^1.0.0-beta",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",

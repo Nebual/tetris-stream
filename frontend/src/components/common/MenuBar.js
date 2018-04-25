@@ -39,7 +39,6 @@ export class MenuBar extends React.Component{
                     <Typography variant="title" color="inherit" className={this.props.classes.flex}>
                         {`Tetris.Stream - ${pageTitles[this.props.page] || ''}`}{this.props.subpage && ` - ${this.props.subpage}`}
                     </Typography>
-                    <Button color="inherit">Do Nothing</Button>
                 </Toolbar>
             </AppBar>
         )

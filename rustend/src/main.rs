@@ -19,6 +19,13 @@ use rocket_cors::{AllowedOrigins, AllowedHeaders, AllowedMethods};
 extern crate diesel;
 #[macro_use] extern crate diesel_migrations;
 
+extern crate ws;
+use std::thread;
+use std::sync::mpsc::channel;
+use std::sync::mpsc::Sender as ThreadOut;
+use ws::{connect, listen, CloseCode, Message, Sender, Handler, Handshake, Result};
+use ws::Error as WSError;
+
 use std::env;
 
 mod pg_pool;
@@ -64,7 +71,47 @@ fn error_500() -> rocket_contrib::Json<rocket_contrib::Value> {
 }
 
 fn main() {
+    //let (log_in, log_out) = channel();
+    struct Server {
+        ws: Sender,
+   //     log: ThreadOut<String>,
+    }
+    impl Handler for Server {
+        fn on_open(&mut self, shake: Handshake) -> Result<()> {
+            println!("Server on open");
+            Ok(())
+        }
+        fn on_error(&mut self, err: WSError) {
+            println!("Server on error {}", err)
+        }
+
+        fn on_message(&mut self, msg: Message) -> Result<()> {
+            println!("Server got message '{}'. ", msg);
+
+            // log it
+     //       self.log.send(msg.to_string()).unwrap();
+
+            // echo it back
+            self.ws.send(msg)
+        }
+
+        fn on_close(&mut self, _: CloseCode, _: &str) {
+            self.ws.shutdown().unwrap()
+        }
+    }
+
+    // Server thread
+    let server = thread::spawn(move || {
+        listen("0.0.0.0:3012", |out| {
+            Server {
+                ws: out,
+        //        log: log_in.clone(),
+            }
+        }).unwrap()
+    });
+
     rocket(false).launch();
+    let _ = server.join();
 }
 
 fn rocket(is_test: bool) -> Rocket {

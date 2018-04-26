@@ -11,6 +11,7 @@ import interval from '../../../utils/interval-promise'
 import styled from "../../../utils/styled"
 import MenuItem from "material-ui/Menu/MenuItem"
 import InventoryMenu from "./InventoryMenu"
+import {PermissionsContext} from '../../common/Contexts'
 
 
 const InventoryContainer = styled('div')({
@@ -44,6 +45,8 @@ export class Inventory extends React.PureComponent{
         isPrimary: PropTypes.bool,
         setSubpageText: PropTypes.func,
         handleClose: PropTypes.func.isRequired,
+        handleChangeCurrentInventory: PropTypes.func.isRequired,
+        handleChangePage: PropTypes.func.isRequired,
     }
     static defaultProps = {
         widthTotal: window.innerWidth < 768 ? (window.innerWidth -30) : 738,
@@ -173,6 +176,10 @@ export class Inventory extends React.PureComponent{
     handleClose = () => {
         this.props.handleClose(this.props.inventoryId)
     }
+    addNewItemFromTemplate = () => {
+        this.props.handleChangeCurrentInventory(this.props.inventoryId)
+        this.props.handleChangePage('LIST_TEMPLATES')
+    }
 
     render() {
         const gridStyle = {
@@ -209,11 +216,16 @@ export class Inventory extends React.PureComponent{
                         }} />
                     ))}
                 </GridLayout>
-                <InventoryMenu>
-                    <MenuItem disabled={true}>{this.state.inventoryTitle}</MenuItem>
-                    <MenuItem onClick={this.refreshInventory}>Refresh</MenuItem>
-                    {!this.props.isPrimary ? <MenuItem onClick={this.handleClose}>Close</MenuItem> : null}
-                </InventoryMenu>
+                <PermissionsContext.Consumer>
+                    {({isGM}) => (
+                        <InventoryMenu>
+                            <MenuItem disabled={true}>{this.state.inventoryTitle}</MenuItem>
+                            <MenuItem onClick={this.refreshInventory}>Refresh</MenuItem>
+                            {isGM && <MenuItem onClick={this.addNewItemFromTemplate}>Add Item</MenuItem>}
+                            {!this.props.isPrimary ? <MenuItem onClick={this.handleClose}>Close</MenuItem> : null}
+                        </InventoryMenu>
+                    )}
+                </PermissionsContext.Consumer>
             </InventoryContainer>
         )
     }

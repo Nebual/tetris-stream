@@ -10,6 +10,8 @@ export class InventoryManager extends React.PureComponent {
         inventoryIds: PropTypes.array.isRequired,
         handleClose: PropTypes.func.isRequired,
         handleChangeInventoryItem: PropTypes.func.isRequired,
+        handleChangeCurrentInventory: PropTypes.func.isRequired,
+        handleChangePage: PropTypes.func.isRequired,
     }
     constructor(props) {
         super(props)
@@ -67,6 +69,8 @@ export class InventoryManager extends React.PureComponent {
                     inventoryId={inventoryId}
                     handleDragEnd={this.handleDragEnd}
                     handleClose={this.props.handleClose}
+                    handleChangeCurrentInventory={this.props.handleChangeCurrentInventory}
+                    handleChangePage={this.props.handleChangePage}
                     isPrimary={this.props.primaryInventoryId === inventoryId}
                     setSubpageText={this.props.primaryInventoryId === inventoryId ? this.props.setSubpageText : undefined}
                 />

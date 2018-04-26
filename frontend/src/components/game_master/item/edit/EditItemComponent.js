@@ -103,6 +103,7 @@ export class EditItemComponent extends React.Component{
         this.setState({
             id: json['id'],
         });
+        this.props.handleChangePage('INVENTORY')
     }
 
     handleChange(e) {

@@ -15,6 +15,7 @@ import {ListItemComponent} from './components/game_master/item/list/ListItemComp
 import {EditItemComponent} from './components/game_master/item/edit/EditItemComponent'
 import {fetchApi} from "./util"
 import {InventorySelect} from "./components/common/InventorySelect"
+import {PermissionsContext} from "./components/common/Contexts"
 
 const styles = {
 	flex: {
@@ -31,39 +32,36 @@ class App extends Component {
 		const template_id = localStorage.getItem('template_id')
 		const item_id = parseInt(localStorage.getItem('item_id'), 10)
 
-		this.state = {
+        this.state = {
             mode: current_page || 'INVENTORY',
             subpage: null,
-			template_id: template_id || null,
-			item_id: item_id || null,
-			currentInventoryId: 0,
-			inventories: new Immutable.Set(JSON.parse(localStorage.getItem('openInventories')) || []),
+            template_id: template_id || null,
+            item_id: item_id || null,
+            characterInventoryId: 0,
+            currentInventoryId: 0,
+            inventories: new Immutable.Set(JSON.parse(localStorage.getItem('openInventories')) || []),
+            permissions: {
+                isGM: true,
+            },
             menu: {
-			    open: false,
-                isGM: true
+                open: false,
             }
-		}
-		this.toggleMenu = this.toggleMenu.bind(this)
-        this.handleChangePage = this.handleChangePage.bind(this)
-        this.handleChangeTemplate = this.handleChangeTemplate.bind(this)
-		this.handleChangeInventoryItem = this.handleChangeInventoryItem.bind(this)
-        this.getPageContents = this.getPageContents.bind(this)
-		this.createSampleCrate = this.createSampleCrate.bind(this)
+        }
 
-		this.state.currentInventoryId = parseInt(localStorage.getItem('currentPlayerInventory'), 10)
-		if (!this.state.currentInventoryId) {
-			fetchApi('inventory', 'POST', {
+        this.state.characterInventoryId = parseInt(localStorage.getItem('currentPlayerInventory'), 10)
+        if (!this.state.characterInventoryId) {
+            fetchApi('inventory', 'POST', {
                 'name': 'Unnamed Player',
                 'class': 'player',
                 'width': 10,
                 'height': 4,
-			}).then((response) => {
-				return response.json();
-			}).then((json) => {
-				this.setState({currentInventoryId: json.id})
-			})
-		}
-	}
+            }).then((response) => {
+                return response.json();
+            }).then((json) => {
+                this.setState({characterInventoryId: json.id})
+            })
+        }
+    }
 
 	toggleMenu = (open) => () => {
 		if (this.state.menu.open !== open) {
@@ -71,7 +69,7 @@ class App extends Component {
 		}
 	}
 
-	handleChangePage(newpage) {
+	handleChangePage = (newpage) => {
         if (this.state.mode !== newpage) {
             this.setState({
                 mode: newpage,
@@ -87,23 +85,20 @@ class App extends Component {
         })
     }
 
-    handleChangeTemplate(newTemplate) {
-        if (this.state.template_id !== newTemplate) {
-            this.setState({template_id: newTemplate})
-            localStorage.setItem('template_id', newTemplate)
-        }
+    handleChangeTemplate = (newTemplate) => {
+        this.setState({template_id: newTemplate})
     }
 
-    handleChangeInventoryItem(newItem) {
-        if (this.state.item_id !== newItem) {
-            this.setState({item_id: newItem})
-            localStorage.setItem('item_id', newItem)
-        }
-	}
+    handleChangeInventoryItem = (newItem) => {
+        this.setState({item_id: newItem})
+    }
+    handleChangeCurrentInventory = (id) => {
+        this.setState({currentInventoryId: id})
+    }
 
     handleChangeCharacter = (id) => {
         this.setState({
-            currentInventoryId: id,
+            characterInventoryId: id,
         })
     }
     handleOpenInventory = (inventoryId) => {
@@ -114,7 +109,7 @@ class App extends Component {
         this.setState({inventories: this.state.inventories.remove(inventoryId)})
     }
 
-	async createSampleCrate() {
+	createSampleCrate = async () => {
 		let crateResponse = await fetchApi('inventory', 'POST', {
 			'name': 'A Box',
 			'width': 10,
@@ -154,16 +149,22 @@ class App extends Component {
 		this.handleChangePage('INVENTORY')
 	}
 
-	componentDidUpdate(prevProps, prevState) {
-		if (prevState.inventories !== this.state.inventories) {
-			localStorage.setItem("openInventories", JSON.stringify(this.state.inventories))
-		}
-		if (prevState.currentInventoryId !== this.state.currentInventoryId) {
-			localStorage.setItem('currentPlayerInventory', this.state.currentInventoryId)
-		}
-	}
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.inventories !== this.state.inventories) {
+            localStorage.setItem("openInventories", JSON.stringify(this.state.inventories))
+        }
+        if (prevState.characterInventoryId !== this.state.characterInventoryId) {
+            localStorage.setItem('currentPlayerInventory', this.state.characterInventoryId)
+        }
+        if (prevState.template_id !== this.state.template_id) {
+            localStorage.setItem('template_id', this.state.template_id)
+        }
+        if (prevState.item_id !== this.state.item_id) {
+            localStorage.setItem('item_id', this.state.item_id)
+        }
+    }
 
-    getPageContents () {
+    getPageContents = () => {
         switch (this.state.mode) {
             case 'CHARACTER_SELECT':
                 return <InventorySelect
@@ -175,10 +176,12 @@ class App extends Component {
                 return (
                     <InventoryManager
                         setSubpageText={this.setSubpageText}
-                        primaryInventoryId={this.state.currentInventoryId}
+                        primaryInventoryId={this.state.characterInventoryId}
                         inventoryIds={this.state.inventories}
                         handleClose={this.handleCloseInventory}
+                        handleChangePage={this.handleChangePage}
                         handleChangeInventoryItem={this.handleChangeInventoryItem}
+                        handleChangeCurrentInventory={this.handleChangeCurrentInventory}
                     />
                 )
 			case 'LIST_GAMES':
@@ -205,8 +208,9 @@ class App extends Component {
                 return (
                     <EditItemComponent
                         item_id={this.state.item_id}
-                        inventory_id={this.state.currentInventoryId}
+                        inventory_id={this.state.currentInventoryId || this.state.characterInventoryId}
                         template_id={parseInt(this.state.template_id, 10)}
+                        handleChangePage={this.handleChangePage}
                     />
 				)
 			case 'LIST_ITEMS':
@@ -244,22 +248,24 @@ class App extends Component {
 	render() {
 		const { classes } = this.props;
 		return (
-			<div className="App">
-				<MenuBar
-                    classes={classes}
-                    toggleMenu={this.toggleMenu}
-                    page={this.state.mode}
-                    subpage={this.state.subpage}
-                />
-				<MenuDrawer
-                    classes={classes}
-                    toggleMenu={this.toggleMenu}
-                    menuOpen={this.state.menu.open}
-                    isGM={this.state.menu.isGM}
-                    handleChangePage={this.handleChangePage}
-                />
-                {this.getPageContents()}
-			</div>
+            <div className="App">
+                <PermissionsContext.Provider value={this.state.permissions}>
+                    <MenuBar
+                        classes={classes}
+                        toggleMenu={this.toggleMenu}
+                        page={this.state.mode}
+                        subpage={this.state.subpage}
+                    />
+                    <MenuDrawer
+                        classes={classes}
+                        toggleMenu={this.toggleMenu}
+                        menuOpen={this.state.menu.open}
+                        isGM={this.state.permissions.isGM}
+                        handleChangePage={this.handleChangePage}
+                    />
+                    {this.getPageContents()}
+                </PermissionsContext.Provider>
+            </div>
 		);
 	}
 }

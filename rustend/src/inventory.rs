@@ -3,12 +3,15 @@ use diesel::prelude::*;
 use diesel::sql_types::{Nullable, Text, Integer};
 use DbConn;
 
+use WSSocketData;
+use std::sync::{Arc, Mutex};
+
 use models::*;
 use schema::{inventory, inventory_item, template_item};
 
 use rocket::response::status;
 use rocket_contrib::{Json, Value};
-use rocket::request::Form;
+use rocket::request::{State, Form};
 
 #[get("/")]
 fn index(conn: DbConn) -> QueryResult<Json<Vec<Inventory>>>
@@ -79,13 +82,22 @@ fn delete(conn: DbConn, inv_id: i32) -> Result<status::NoContent, diesel::result
 }
 
 #[post("/<inv_id>/game", data = "<new>")]
-fn change_game(conn: DbConn, inv_id: i32, new: Json<InventoryGameChange>) -> QueryResult<Json<Inventory>>
+fn change_game(conn: DbConn, ws_connections: State<Arc<Mutex<Vec<Arc<WSSocketData>>>>>, inv_id: i32, new: Json<InventoryGameChange>) -> QueryResult<Json<Inventory>>
 {
     assert!(inv_id > 0);
-    diesel::update(inventory::table.find(inv_id))
+    let game_id = new.game_id;
+    let result = diesel::update(inventory::table.find(inv_id))
         .set(&new.into_inner())
         .get_result::<Inventory>(&*conn)
-        .map(|p| Json(p))
+        .map(|p| Json(p));
+
+    if let Ok(ws_connections) = ws_connections.lock() {
+        ws_connections.iter().for_each(move |x| {
+            x.ws.send(format!("Inv {} added to game {}", inv_id, game_id.unwrap_or(0))).unwrap();
+        });
+    }
+
+    result
 }
 
 #[get("/<inv_id>/items")]

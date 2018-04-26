@@ -10,6 +10,8 @@ import GameIcon from '@material-ui/icons/Casino'
 import ItemIcon from '@material-ui/icons/GolfCourse'
 import ContainerIcon from '@material-ui/icons/FreeBreakfast'
 
+import {API_HOST} from "../../util"
+
 export class MenuDrawer extends React.Component{
     static propTypes = {
         toggleMenu: PropTypes.func.isRequired,
@@ -17,6 +19,20 @@ export class MenuDrawer extends React.Component{
         classes: PropTypes.object.isRequired,
         isGM: PropTypes.bool.isRequired,
         menuOpen: PropTypes.bool.isRequired
+    }
+    ws_test = () => {
+        const socket = new WebSocket(`ws://${API_HOST}:3012`)
+
+        socket.addEventListener('open', function (event) {
+            socket.send('Hello Server!')
+        })
+        socket.addEventListener('close', function (event) {
+            console.log('WS: Closed connection')
+        })
+
+        socket.addEventListener('message', function (event) {
+            console.log('Message from server ', event.data)
+        })
     }
 
     render() {
@@ -76,6 +92,10 @@ export class MenuDrawer extends React.Component{
                                 <ContainerIcon />
                             </ListItemIcon>
                             <ListItemText primary="Containers"/>
+                        </ListItem>
+                        <ListItem button onClick={this.ws_test}>
+                            <ListItemIcon><GameIcon /></ListItemIcon>
+                            <ListItemText primary="WS Test"/>
                         </ListItem>
                     </List>
                 ) : null}

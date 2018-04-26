@@ -14,3 +14,5 @@ serde_derive = "*"
 
 diesel = { version = "1.2.*", features = ["postgres", "r2d2"] }
 diesel_migrations = "1.2.*"
+
+ws = "0.7.*"

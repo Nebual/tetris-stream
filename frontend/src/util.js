@@ -10,3 +10,5 @@ export function fetchApi(endpoint, method, body, options) {
 	}
 	return fetch(`${API_URL}/${endpoint}`, options)
 }
+
+export const API_HOST = (new URL(API_URL)).hostname

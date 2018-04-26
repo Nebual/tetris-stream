@@ -27,6 +27,9 @@ use rocket::config::LoggingLevel;
 use rocket::Config;
 use rocket::config::Environment;
 
+mod websocket;
+pub use websocket::WSSocketData;
+
 mod schema;
 mod models;
 mod item;
@@ -65,7 +68,11 @@ fn error_500() -> rocket_contrib::Json<rocket_contrib::Value> {
 }
 
 fn main() {
-    rocket(false).launch();
+    let (servers, ws_thread) = websocket::start_websocket_server();
+    rocket(false)
+        .manage(servers)
+        .launch();
+    let _ = ws_thread.join();
 }
 
 fn rocket(is_test: bool) -> Rocket {

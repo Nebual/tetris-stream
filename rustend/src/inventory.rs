@@ -78,6 +78,16 @@ fn delete(conn: DbConn, inv_id: i32) -> Result<status::NoContent, diesel::result
     Ok(status::NoContent)
 }
 
+#[post("/<inv_id>/game", data = "<new>")]
+fn change_game(conn: DbConn, inv_id: i32, new: Json<InventoryGameChange>) -> QueryResult<Json<Inventory>>
+{
+    assert!(inv_id > 0);
+    diesel::update(inventory::table.find(inv_id))
+        .set(&new.into_inner())
+        .get_result::<Inventory>(&*conn)
+        .map(|p| Json(p))
+}
+
 #[get("/<inv_id>/items")]
 fn get_items(conn: DbConn, inv_id: i32) -> Option<Json<Vec<InventoryItem>>>
 {

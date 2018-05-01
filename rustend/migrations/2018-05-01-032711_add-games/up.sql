@@ -1,0 +1,7 @@
+CREATE TABLE game (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL DEFAULT ''
+);
+ALTER TABLE inventory
+  ADD COLUMN game_id INTEGER REFERENCES game(id)
+;

@@ -2,6 +2,7 @@ use super::schema::{
     template_item,
     inventory,
     inventory_item,
+    game,
 };
 
 mod inventory_item_helpers;
@@ -79,6 +80,7 @@ pub struct NewInventoryItem {
 
 #[derive(Queryable, Identifiable, Serialize, Deserialize, Associations, Debug)]
 #[primary_key(id)]
+#[belongs_to(Game, foreign_key = "game_id")]
 #[table_name = "inventory"]
 pub struct Inventory {
     pub id: i32,
@@ -86,6 +88,7 @@ pub struct Inventory {
     pub class: String,
     pub width: i32,
     pub height: i32,
+    pub game_id: Option<i32>,
 }
 
 #[derive(Insertable, AsChangeset, Serialize, Deserialize, Debug, Default)]
@@ -95,4 +98,26 @@ pub struct NewInventory {
     pub class: Option<String>,
     pub width: Option<i32>,
     pub height: Option<i32>,
+    pub game_id: Option<i32>,
+}
+
+#[derive(AsChangeset, Deserialize)]
+#[changeset_options(treat_none_as_null = "true")]
+#[table_name = "inventory"]
+pub struct InventoryGameChange {
+    pub game_id: Option<i32>,
+}
+
+#[derive(Queryable, Identifiable, Serialize, Deserialize, Associations, Debug)]
+#[primary_key(id)]
+#[table_name = "game"]
+pub struct Game {
+    pub id: i32,
+    pub name: String,
+}
+
+#[derive(Insertable, AsChangeset, Serialize, Deserialize, Debug, Default)]
+#[table_name = "game"]
+pub struct NewGame {
+    pub name: Option<String>,
 }

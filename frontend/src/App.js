@@ -16,6 +16,7 @@ import {EditItemComponent} from './components/game_master/item/edit/EditItemComp
 import {fetchApi} from "./util"
 import {InventorySelect} from "./components/common/InventorySelect"
 import {PermissionsContext} from "./components/common/Contexts"
+import {GameSelect} from "./components/player/GameSelect"
 
 const styles = {
 	flex: {
@@ -25,8 +26,8 @@ const styles = {
 
 
 class App extends Component {
-	constructor(props) {
-		super(props)
+    constructor(props) {
+        super(props)
 
         const current_page = localStorage.getItem('current_page')
 		const template_id = localStorage.getItem('template_id')
@@ -39,9 +40,10 @@ class App extends Component {
             item_id: item_id || null,
             characterInventoryId: 0,
             currentInventoryId: 0,
+            game_id: parseInt(localStorage.getItem('game_id'), 10) || null,
             inventories: new Immutable.Set(JSON.parse(localStorage.getItem('openInventories')) || []),
             permissions: {
-                isGM: true,
+                isGM: localStorage.getItem('isGM') > 0,
             },
             menu: {
                 open: false,
@@ -79,6 +81,11 @@ class App extends Component {
         }
     }
 
+    handleChangeGame = async (gameId, isHosting) => {
+        await fetchApi(`inventory/${this.state.characterInventoryId}/game`, 'POST', {'game_id': isHosting ? null : gameId})
+        this.setState({game_id: gameId, permissions: {...this.state.permissions, isGM: isHosting}})
+    }
+
     setSubpageText = (text) => {
         this.setState({
             subpage: text,
@@ -103,6 +110,9 @@ class App extends Component {
     }
     handleOpenInventory = (inventoryId) => {
         this.setState({inventories: this.state.inventories.add(inventoryId)})
+    }
+    handlePresentInventory = async (inventoryId) => {
+        await fetchApi(`inventory/${inventoryId}/game`, 'POST', {'game_id': this.state.game_id})
     }
 
     handleCloseInventory = (inventoryId) => {
@@ -162,6 +172,12 @@ class App extends Component {
         if (prevState.item_id !== this.state.item_id) {
             localStorage.setItem('item_id', this.state.item_id)
         }
+        if (prevState.game_id !== this.state.game_id) {
+            localStorage.setItem('game_id', this.state.game_id)
+        }
+        if (prevState.permissions.isGM !== this.state.permissions.isGM) {
+            localStorage.setItem('isGM', this.state.permissions.isGM ? '1' : '0')
+        }
     }
 
     getPageContents = () => {
@@ -184,8 +200,11 @@ class App extends Component {
                         handleChangeCurrentInventory={this.handleChangeCurrentInventory}
                     />
                 )
-			case 'LIST_GAMES':
-				return null
+            case 'LIST_GAMES':
+                return <GameSelect
+                    handleChangePage={this.handleChangePage}
+                    handleChangeGame={this.handleChangeGame}
+                />
 			case 'LIST_PLAYERS':
 				return null
             case 'EDIT_TEMPLATE':
@@ -228,6 +247,7 @@ class App extends Component {
                     <InventorySelect
                         handleChangePage={this.handleChangePage}
                         handleInventorySelect={this.handleOpenInventory}
+                        handlePresentInventory={this.handlePresentInventory}
                         inventoryClass="crate"
                     />
                     <Button

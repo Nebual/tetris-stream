@@ -5,10 +5,12 @@ import Paper from 'material-ui/Paper'
 import Button from 'material-ui/Button'
 import {fetchApi} from "../../util"
 import {EditableText} from "./EditableText"
+import {PermissionsContext} from './Contexts'
 
 export class InventorySelect extends React.PureComponent {
     static propTypes = {
         handleInventorySelect: PropTypes.func.isRequired,
+        handlePresentInventory: PropTypes.func,
         handleChangePage: PropTypes.func.isRequired,
         inventoryClass: PropTypes.string.isRequired,
     }
@@ -98,6 +100,13 @@ export class InventorySelect extends React.PureComponent {
                                         color="primary"
                                         onClick={() => this.handleLoadInventory(row.id)}
                                     >Load</Button>
+                                    {this.props.inventoryClass === "crate" &&
+                                        <PermissionsContext.Consumer>
+                                            {({isGM}) => isGM && (
+                                                <Button color="secondary" onClick={() => this.props.handlePresentInventory(row.id)}>Present to Players</Button>
+                                            )}
+                                        </PermissionsContext.Consumer>
+                                    }
                                 </TableCell>
                             </TableRow>
                         ))}

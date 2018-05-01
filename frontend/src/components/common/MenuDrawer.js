@@ -36,17 +36,17 @@ export class MenuDrawer extends React.Component{
                         </ListItemIcon>
                         <ListItemText primary="Inventory"/>
                     </ListItem>
+                    <ListItem button onClick={() => {this.props.handleChangePage('LIST_GAMES')}}>
+                        <ListItemIcon>
+                            <GameIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Game Sessions"/>
+                    </ListItem>
                 </List>
                 <Divider />
                 {this.props.isGM ? (
                     <List>
                         <ListSubheader>Gm Zone</ListSubheader>
-                        <ListItem button onClick={() => {this.props.handleChangePage('LIST_GAMES')}}>
-                            <ListItemIcon>
-                                <GameIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Games"/>
-                        </ListItem>
                         <ListItem button onClick={() => {this.props.handleChangePage('LIST_PLAYERS')}}>
                             <ListItemIcon>
                                 <GameIcon />

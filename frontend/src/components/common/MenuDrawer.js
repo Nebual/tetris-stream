@@ -24,7 +24,7 @@ export class MenuDrawer extends React.Component{
         const socket = new WebSocket(`ws://${API_HOST}:3012`)
 
         socket.addEventListener('open', function (event) {
-            socket.send('Hello Server!')
+            socket.send(JSON.stringify({action: 'gameId', value: 1}))
         })
         socket.addEventListener('close', function (event) {
             console.log('WS: Closed connection')

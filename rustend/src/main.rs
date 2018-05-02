@@ -28,7 +28,7 @@ use rocket::Config;
 use rocket::config::Environment;
 
 mod websocket;
-pub use websocket::WSSocketData;
+pub use websocket::{WSSocketData, WSSocketDataMutexVec};
 
 mod schema;
 mod models;

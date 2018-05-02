@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use diesel::sql_types::{Nullable, Text, Integer};
 use DbConn;
 
-use WSSocketData;
+use {WSSocketData, WSSocketDataMutexVec};
 use std::sync::{Arc, Mutex};
 
 use models::*;
@@ -82,10 +82,10 @@ fn delete(conn: DbConn, inv_id: i32) -> Result<status::NoContent, diesel::result
 }
 
 #[post("/<inv_id>/game", data = "<new>")]
-fn change_game(conn: DbConn, ws_connections: State<Arc<Mutex<Vec<Arc<WSSocketData>>>>>, inv_id: i32, new: Json<InventoryGameChange>) -> QueryResult<Json<Inventory>>
+fn change_game(conn: DbConn, ws_connections: State<WSSocketDataMutexVec>, inv_id: i32, new: Json<InventoryGameChange>) -> QueryResult<Json<Inventory>>
 {
     assert!(inv_id > 0);
-    let game_id = new.game_id;
+    let game_id = new.game_id.unwrap_or(0);
     let result = diesel::update(inventory::table.find(inv_id))
         .set(&new.into_inner())
         .get_result::<Inventory>(&*conn)
@@ -93,7 +93,12 @@ fn change_game(conn: DbConn, ws_connections: State<Arc<Mutex<Vec<Arc<WSSocketDat
 
     if let Ok(ws_connections) = ws_connections.lock() {
         ws_connections.iter().for_each(move |x| {
-            x.ws.send(format!("Inv {} added to game {}", inv_id, game_id.unwrap_or(0))).unwrap();
+            if *x.game_id.read().unwrap() == game_id {
+                x.ws.send(json!({
+                    "game_id": game_id,
+                    "inv_id": inv_id,
+                }).to_string()).unwrap();
+            }
         });
     }
 

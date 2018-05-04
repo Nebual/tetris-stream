@@ -70,13 +70,13 @@ fn create(conn: DbConn, new: Json<NewGame>) -> QueryResult<Json<Game>>
 }
 
 #[patch("/<id>", data = "<new>")]
-fn update(conn: DbConn, id: i32, new: Json<NewGame>) -> QueryResult<Json<Game>>
+fn update(conn: DbConn, id: i32, new: Json<NewGame>) -> QueryResult<Json<GameWithPlayers>>
 {
     assert!(id > 0);
     diesel::update(game::table.find(id))
         .set(&new.into_inner())
         .get_result::<Game>(&*conn)
-        .map(|p| Json(p))
+        .map(|p| Json(GameWithPlayers{id: p.id, name: p.name, players: Vec::new()}))
 }
 
 #[delete("/<id>")]

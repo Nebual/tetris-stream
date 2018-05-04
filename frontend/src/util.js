@@ -12,4 +12,5 @@ export function fetchApi(endpoint, method, body, options) {
 	return fetch(`${API_URL}/${endpoint}`, options)
 }
 
-export const WS_URL = `ws://${apiUrl.hostname}` + (process.env.NODE_ENV === 'production' ? '/ws/' : ':3012');
+const wsProtocol = process.env.NODE_ENV === 'production' ? 'wss' : 'ws';
+export const WS_URL = `${wsProtocol}://${apiUrl.hostname}` + (process.env.NODE_ENV === 'production' ? '/ws/' : ':3012');

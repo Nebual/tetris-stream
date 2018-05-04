@@ -163,11 +163,11 @@ class App extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (prevState.inventories !== this.state.inventories) {
             localStorage.setItem("openInventories", JSON.stringify(this.state.inventories))
-            this.ws.send(JSON.stringify({action: 'subscribedInventories', value: this.state.inventories}))
+            this.wsSend(JSON.stringify({action: 'subscribedInventories', value: this.state.inventories}))
         }
         if (prevState.characterInventoryId !== this.state.characterInventoryId) {
             localStorage.setItem('currentPlayerInventory', this.state.characterInventoryId)
-            this.ws.send(JSON.stringify({action: 'characterInventoryId', value: this.state.characterInventoryId}))
+            this.wsSend(JSON.stringify({action: 'characterInventoryId', value: this.state.characterInventoryId}))
         }
         if (prevState.template_id !== this.state.template_id) {
             localStorage.setItem('template_id', this.state.template_id)
@@ -177,7 +177,7 @@ class App extends Component {
         }
         if (prevState.game_id !== this.state.game_id) {
             localStorage.setItem('game_id', this.state.game_id)
-            this.ws.send(JSON.stringify({action: 'gameId', value: this.state.game_id}))
+            this.wsSend(JSON.stringify({action: 'gameId', value: this.state.game_id}))
         }
         if (prevState.permissions.isGM !== this.state.permissions.isGM) {
             localStorage.setItem('isGM', this.state.permissions.isGM ? '1' : '0')
@@ -190,6 +190,12 @@ class App extends Component {
         if (this.ws) {
             this.ws.close(4010)
             clearTimeout(this.ws.reconnectTimeout)
+        }
+    }
+
+    wsSend = (msg) => {
+        if (this.ws && this.ws.readyState === this.ws.OPEN) {
+            this.ws.send(msg)
         }
     }
 

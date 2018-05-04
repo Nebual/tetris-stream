@@ -14,6 +14,10 @@ use rocket::response::status;
 use rocket_contrib::{Json, Value};
 use rocket::request::{State, Form};
 
+extern crate thunk;
+
+use self::thunk::{LazyRef, unsync::Thunk};
+
 #[get("/")]
 fn index(conn: DbConn) -> QueryResult<Json<Vec<Inventory>>>
 {
@@ -146,8 +150,8 @@ fn move_item(conn: DbConn, dest_inv_id: i32, req: Json<MoveItemRequest>, ws_conn
 }
 
 fn broadcast_inventory_changes(conn: DbConn, ws_connections: State<WSSocketDataMutexVec>, source_inv_id: i32, dest_inv_id: i32) {
-    let source_inv_items = InventoryItem::get_in_inventory(&conn, source_inv_id).unwrap_or(Vec::new());
-    let dest_inv_items = InventoryItem::get_in_inventory(&conn, dest_inv_id).unwrap_or(Vec::new());
+    let source_inv_items = Thunk::defer(|| InventoryItem::get_in_inventory(&conn, source_inv_id).unwrap_or(Vec::new()));
+    let dest_inv_items = Thunk::defer(|| InventoryItem::get_in_inventory(&conn, dest_inv_id).unwrap_or(Vec::new()));
     if let Ok(ws_connections) = ws_connections.lock() {
         ws_connections.iter().for_each(move |wsdata| {
             let subscribed_inventories = wsdata.subscribed_inventories.read().unwrap();
@@ -155,10 +159,10 @@ fn broadcast_inventory_changes(conn: DbConn, ws_connections: State<WSSocketDataM
                 // they're likely not subscribed to both inventories
                 let mut updates = HashMap::with_capacity(2);
                 if subscribed_inventories.contains(&source_inv_id) {
-                    updates.insert(source_inv_id.to_string(), &source_inv_items);
+                    updates.insert(source_inv_id.to_string(), &*source_inv_items);
                 }
                 if source_inv_id != dest_inv_id && subscribed_inventories.contains(&dest_inv_id) {
-                    updates.insert(dest_inv_id.to_string(), &dest_inv_items);
+                    updates.insert(dest_inv_id.to_string(), &*dest_inv_items);
                 }
                 wsdata.ws.send(json!({
                     "action": "inventoryItems",

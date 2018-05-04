@@ -16,13 +16,19 @@ export class InventoryManager extends React.PureComponent {
     }
     constructor(props) {
         super(props)
+        this.inventoryRefs = new Map()
 
         this.handleDragEnd = this.handleDragEnd.bind(this)
     }
 
     handleDragEnd(layout, oldItem, newItem, e, draggedElement, sourceInventory) {
         const draggedRect = draggedElement.getBoundingClientRect()
-        Object.values(this.refs).forEach((inv) => {
+        this.inventoryRefs.forEach((inv, key) => {
+            if (inv._destroyed) {
+                this.inventoryRefs.delete(key)
+                return
+            }
+
             if (inv === sourceInventory) {
                 return
             }
@@ -60,6 +66,10 @@ export class InventoryManager extends React.PureComponent {
         })
         this.props.handleChangeInventoryItem(newItem.i)
     }
+    addInventoryRef = (ref) => {
+        if (!ref) return
+        this.inventoryRefs.set(ref.props.inventoryId, ref)
+    }
 
     render() {
         return <WSPacketContext.Consumer>{(wsPacket) => {
@@ -67,7 +77,7 @@ export class InventoryManager extends React.PureComponent {
             return [this.props.primaryInventoryId, ...this.props.inventoryIds].map(inventoryId => (
                 <Inventory
                     key={inventoryId}
-                    ref={inventoryId}
+                    ref={this.addInventoryRef}
                     inventoryId={inventoryId}
                     handleDragEnd={this.handleDragEnd}
                     handleClose={this.props.handleClose}

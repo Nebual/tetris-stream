@@ -13,9 +13,9 @@ import {ListTemplateComponent} from './components/game_master/template/list/List
 import {EditTemplateComponent} from './components/game_master/template/edit/EditTemplateComponent'
 import {ListItemComponent} from './components/game_master/item/list/ListItemComponent'
 import {EditItemComponent} from './components/game_master/item/edit/EditItemComponent'
-import {fetchApi} from "./util"
+import {WS_URL, fetchApi} from "./util"
 import {InventorySelect} from "./components/common/InventorySelect"
-import {PermissionsContext} from "./components/common/Contexts"
+import {PermissionsContext, WSPacketContext} from "./components/common/Contexts"
 import {GameSelect} from "./components/player/GameSelect"
 
 const styles = {
@@ -45,6 +45,7 @@ class App extends Component {
             permissions: {
                 isGM: localStorage.getItem('isGM') > 0,
             },
+            wsPacket: {},
             menu: {
                 open: false,
             }
@@ -162,9 +163,11 @@ class App extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (prevState.inventories !== this.state.inventories) {
             localStorage.setItem("openInventories", JSON.stringify(this.state.inventories))
+            this.ws.send(JSON.stringify({action: 'subscribedInventories', value: this.state.inventories}))
         }
         if (prevState.characterInventoryId !== this.state.characterInventoryId) {
             localStorage.setItem('currentPlayerInventory', this.state.characterInventoryId)
+            this.ws.send(JSON.stringify({action: 'characterInventoryId', value: this.state.characterInventoryId}))
         }
         if (prevState.template_id !== this.state.template_id) {
             localStorage.setItem('template_id', this.state.template_id)
@@ -174,10 +177,57 @@ class App extends Component {
         }
         if (prevState.game_id !== this.state.game_id) {
             localStorage.setItem('game_id', this.state.game_id)
+            this.ws.send(JSON.stringify({action: 'gameId', value: this.state.game_id}))
         }
         if (prevState.permissions.isGM !== this.state.permissions.isGM) {
             localStorage.setItem('isGM', this.state.permissions.isGM ? '1' : '0')
         }
+    }
+    componentDidMount() {
+        this.launchWebsocket()
+    }
+    componentWillUnmount() {
+        if (this.ws) {
+            this.ws.close(4010)
+            clearTimeout(this.ws.reconnectTimeout)
+        }
+    }
+
+    launchWebsocket = () => {
+        if (this.ws) {
+            this.ws.close(4011)
+        }
+        this.ws = new WebSocket(WS_URL)
+        this.ws.addEventListener('open', (event) => {
+            console.debug("WS: Opening connection")
+            this.ws.send(JSON.stringify({action: 'gameId', value: this.state.game_id}))
+            this.ws.send(JSON.stringify({action: 'characterInventoryId', value: this.state.characterInventoryId}))
+            this.ws.send(JSON.stringify({action: 'subscribedInventories', value: this.state.inventories}))
+        })
+
+        this.ws.addEventListener('close', (event) => {
+            console.debug('WS: Closed connection', event.code)
+            if (event.code === 4010 || event.code === 4011) {
+                return
+            }
+            if (this.ws.reconnectTimeout) {
+                clearTimeout(this.ws.reconnectTimeout)
+            }
+            this.ws.reconnectTimeout = setTimeout(() => {
+                this.launchWebsocket()
+            }, 10000)
+        })
+
+        this.ws.addEventListener('message', (event) => {
+            console.debug('Message from server ', event.data)
+            const packet = JSON.parse(event.data)
+
+            if (packet.action === 'openInventory') {
+                this.handleOpenInventory(packet.value)
+            } else {
+                this.setState({wsPacket: packet})
+            }
+        })
     }
 
     getPageContents = () => {
@@ -270,20 +320,22 @@ class App extends Component {
 		return (
             <div className="App">
                 <PermissionsContext.Provider value={this.state.permissions}>
-                    <MenuBar
-                        classes={classes}
-                        toggleMenu={this.toggleMenu}
-                        page={this.state.mode}
-                        subpage={this.state.subpage}
-                    />
-                    <MenuDrawer
-                        classes={classes}
-                        toggleMenu={this.toggleMenu}
-                        menuOpen={this.state.menu.open}
-                        isGM={this.state.permissions.isGM}
-                        handleChangePage={this.handleChangePage}
-                    />
-                    {this.getPageContents()}
+                    <WSPacketContext.Provider value={this.state.wsPacket}>
+                        <MenuBar
+                            classes={classes}
+                            toggleMenu={this.toggleMenu}
+                            page={this.state.mode}
+                            subpage={this.state.subpage}
+                        />
+                        <MenuDrawer
+                            classes={classes}
+                            toggleMenu={this.toggleMenu}
+                            menuOpen={this.state.menu.open}
+                            isGM={this.state.permissions.isGM}
+                            handleChangePage={this.handleChangePage}
+                        />
+                        {this.getPageContents()}
+                    </WSPacketContext.Provider>
                 </PermissionsContext.Provider>
             </div>
 		);

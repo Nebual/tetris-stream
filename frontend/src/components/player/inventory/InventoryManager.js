@@ -2,12 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import {Inventory} from "./Inventory"
+import {WSPacketContext} from '../../common/Contexts'
 
 export class InventoryManager extends React.PureComponent {
     static propTypes = {
         setSubpageText: PropTypes.func.isRequired,
         primaryInventoryId: PropTypes.number.isRequired,
-        inventoryIds: PropTypes.array.isRequired,
+        inventoryIds: PropTypes.object.isRequired,
         handleClose: PropTypes.func.isRequired,
         handleChangeInventoryItem: PropTypes.func.isRequired,
         handleChangeCurrentInventory: PropTypes.func.isRequired,
@@ -61,8 +62,9 @@ export class InventoryManager extends React.PureComponent {
     }
 
     render() {
-        return (
-            [this.props.primaryInventoryId, ...this.props.inventoryIds].map(inventoryId => (
+        return <WSPacketContext.Consumer>{(wsPacket) => {
+            const inventoryUpdates = wsPacket.action === 'inventoryItems' ? wsPacket.value : {}
+            return [this.props.primaryInventoryId, ...this.props.inventoryIds].map(inventoryId => (
                 <Inventory
                     key={inventoryId}
                     ref={inventoryId}
@@ -73,8 +75,9 @@ export class InventoryManager extends React.PureComponent {
                     handleChangePage={this.props.handleChangePage}
                     isPrimary={this.props.primaryInventoryId === inventoryId}
                     setSubpageText={this.props.primaryInventoryId === inventoryId ? this.props.setSubpageText : undefined}
+                    inventoryUpdate={inventoryUpdates[inventoryId]}
                 />
             ))
-        )
+        }}</WSPacketContext.Consumer>
     }
 }

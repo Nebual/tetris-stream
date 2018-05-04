@@ -62,9 +62,9 @@ impl models::InventoryItem {
         inventory_item_select!()
             .get_results(&*conn)
     }
-    pub fn get_in_inventory(conn: DbConn, inv_id: i32) -> QueryResult<Vec<InventoryItem>> {
+    pub fn get_in_inventory(conn: &DbConn, inv_id: i32) -> QueryResult<Vec<InventoryItem>> {
         inventory_item_select!()
             .filter(inventory_item::inventory_id.eq(inv_id))
-            .get_results(&*conn)
+            .get_results(&**conn)
     }
 }

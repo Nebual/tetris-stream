@@ -15,6 +15,7 @@ pub struct WSSocketData {
     pub ws: Sender,
     pub player_inventory_id: RwLock<i32>,
     pub game_id: RwLock<i32>,
+    pub subscribed_inventories: RwLock<Vec<i32>>,
 }
 type WSSocketDataArc = Arc<WSSocketData>;
 pub type WSSocketDataMutexVec = Arc<Mutex<Vec<WSSocketDataArc>>>;
@@ -30,19 +31,6 @@ pub fn start_websocket_server() -> (WSSocketDataMutexVec, thread::JoinHandle<()>
         context: WSSocketDataArc,
         others: WSSocketDataMutexVec,
     }
-    /*
-    impl Server {
-        fn broadcast(&mut self, msg: String) {
-            let id = self.context.id;
-            self.others.lock().unwrap()
-                .iter().for_each(move |x| {
-                if x.id != id {
-                    x.ws.send(msg).unwrap();
-                }
-            });
-        }
-    }
-    */
     impl Handler for Server {
         fn on_open(&mut self, _shake: Handshake) -> Result<()> {
             println!("WSServer {} open", self.context.id);
@@ -58,11 +46,15 @@ pub fn start_websocket_server() -> (WSSocketDataMutexVec, thread::JoinHandle<()>
             let msg = msg.into_text()?;
             if let Ok(packet) = serde_json::from_str::<WSPacket>(&msg) {
                 match packet.action.as_ref() {
-                    "playerInventoryId" => {
+                    "characterInventoryId" => {
                         *self.context.player_inventory_id.write().unwrap() = packet.value.as_i64().unwrap_or(0) as i32;
                     },
                     "gameId" => {
                         *self.context.game_id.write().unwrap() = packet.value.as_i64().unwrap_or(0) as i32;
+                    },
+                    "subscribedInventories" => {
+                        let vec: Vec<i32> = packet.value.as_array().unwrap().into_iter().map(|value| value.as_i64().unwrap_or(0) as i32).collect();
+                        *self.context.subscribed_inventories.write().unwrap() = vec;
                     },
                     action => {
                         println!("Unhandled action {}", action)
@@ -74,14 +66,15 @@ pub fn start_websocket_server() -> (WSSocketDataMutexVec, thread::JoinHandle<()>
             Ok(())
         }
 
-        fn on_close(&mut self, _: CloseCode, _: &str) {
-            println!("WSServer {} closing", self.context.id);
+        fn on_close(&mut self, close_code: CloseCode, _: &str) {
+            let close_code: u16 = close_code.into();
+            println!("WSServer {} closing because {}", self.context.id, close_code);
             if let Ok(mut servers) = self.others.lock() {
                 let id = self.context.id;
                 let index = servers.iter().position(|x| x.id == id).unwrap();
                 servers.remove(index);
             }
-            self.context.ws.shutdown().unwrap()
+            self.context.ws.close(CloseCode::Normal).unwrap()
         }
     }
     let servers: WSSocketDataMutexVec = Arc::new(Mutex::new(Vec::new()));
@@ -96,6 +89,7 @@ pub fn start_websocket_server() -> (WSSocketDataMutexVec, thread::JoinHandle<()>
                 ws: out,
                 player_inventory_id: RwLock::new(0),
                 game_id: RwLock::new(0),
+                subscribed_inventories: RwLock::new(Vec::new()),
             });
             servers.lock().unwrap().push(server.clone());
             Server {

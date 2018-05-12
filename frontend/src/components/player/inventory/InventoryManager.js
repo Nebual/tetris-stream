@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import {Inventory} from "./Inventory"
+import {ItemOverlay} from "./ItemOverlay"
 import {WSPacketContext} from '../../common/Contexts'
 
 export class InventoryManager extends React.PureComponent {
@@ -16,6 +17,9 @@ export class InventoryManager extends React.PureComponent {
     }
     constructor(props) {
         super(props)
+        this.state = {
+          overlayItem: null,
+        }
         this.inventoryRefs = new Map()
 
         this.handleDragEnd = this.handleDragEnd.bind(this)
@@ -70,24 +74,40 @@ export class InventoryManager extends React.PureComponent {
         if (!ref) return
         this.inventoryRefs.set(ref.props.inventoryId, ref)
     }
+    handleOpenOverlay = (item) => {
+        this.setState({overlayItem: item})
+    }
+    handleDiscard = (item) => {
+        // todo: tell server its removed, update Inventory component somehow
+        this.setState({overlayItem: null})
+    }
 
     render() {
         return <WSPacketContext.Consumer>{(wsPacket) => {
             const inventoryUpdates = wsPacket.action === 'inventoryItems' ? wsPacket.value : {}
-            return [this.props.primaryInventoryId, ...this.props.inventoryIds].map(inventoryId => (
-                <Inventory
-                    key={inventoryId}
-                    ref={this.addInventoryRef}
-                    inventoryId={inventoryId}
-                    handleDragEnd={this.handleDragEnd}
-                    handleClose={this.props.handleClose}
-                    handleChangeCurrentInventory={this.props.handleChangeCurrentInventory}
-                    handleChangePage={this.props.handleChangePage}
-                    isPrimary={this.props.primaryInventoryId === inventoryId}
-                    setSubpageText={this.props.primaryInventoryId === inventoryId ? this.props.setSubpageText : undefined}
-                    inventoryUpdate={inventoryUpdates[inventoryId]}
+            return <React.Fragment>
+                {[this.props.primaryInventoryId, ...this.props.inventoryIds].map(inventoryId => (
+                    <Inventory
+                        key={inventoryId}
+                        ref={this.addInventoryRef}
+                        inventoryId={inventoryId}
+                        handleDragEnd={this.handleDragEnd}
+                        handleClose={this.props.handleClose}
+                        handleChangeCurrentInventory={this.props.handleChangeCurrentInventory}
+                        handleChangePage={this.props.handleChangePage}
+                        handleOpenOverlay={this.handleOpenOverlay}
+                        isPrimary={this.props.primaryInventoryId === inventoryId}
+                        setSubpageText={this.props.primaryInventoryId === inventoryId ? this.props.setSubpageText : undefined}
+                        inventoryUpdate={inventoryUpdates[inventoryId]}
+                    />
+                ))}
+                <ItemOverlay
+                    visible={this.state.overlayItem ? true : false}
+                    item={this.state.overlayItem || {}}
+                    handleClose={this.handleOpenOverlay}
+                    handleDiscard={this.handleDiscard}
                 />
-            ))
+            </React.Fragment>
         }}</WSPacketContext.Consumer>
     }
 }

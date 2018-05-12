@@ -11,6 +11,8 @@ RUN set -eux; \
     rm rustup-init; \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME;
 
+RUN wget -q https://github.com/krallin/tini/releases/download/v0.17.0/tini -O /tini && chmod +x /tini
+
 RUN cargo install cargo-watch
 RUN cargo install diesel_cli --no-default-features --features postgres
 
@@ -25,6 +27,5 @@ RUN mkdir src target && touch src/lib.rs && cargo fetch && rm -rf src
 VOLUME ["/usr/local/cargo"]
 
 COPY .gitignore wait-for-it.sh start.sh /app/rustend/
-RUN wget -q https://github.com/krallin/tini/releases/download/v0.17.0/tini -O /tini && chmod +x /tini
 ENTRYPOINT ["/tini", "--"]
 CMD ["/app/rustend/start.sh"]

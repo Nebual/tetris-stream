@@ -9,6 +9,7 @@ import {fetchApi} from "../../../util"
 import styled from "../../../utils/styled"
 import MenuItem from "material-ui/Menu/MenuItem"
 import InventoryMenu from "./InventoryMenu"
+import {InventoryItem} from "./InventoryItem"
 import {PermissionsContext} from '../../common/Contexts'
 
 
@@ -45,6 +46,7 @@ export class Inventory extends React.PureComponent{
         handleClose: PropTypes.func.isRequired,
         handleChangeCurrentInventory: PropTypes.func.isRequired,
         handleChangePage: PropTypes.func.isRequired,
+        handleOpenOverlay: PropTypes.func.isRequired,
     }
     static defaultProps = {
         widthTotal: window.innerWidth < 768 ? (window.innerWidth -30) : 738,
@@ -210,10 +212,11 @@ export class Inventory extends React.PureComponent{
                     onLayoutChange={this.onLayoutChange}
                 >
                     {this.state.items.map(item => (
-                        <div className="item" key={item.i} style={{
-                            backgroundImage: `url('${item.image_url}')`,
-                            backgroundSize: "100% 100%",
-                        }} />
+                        <InventoryItem
+                            item={item}
+                            key={item.i}
+                            handleOpenOverlay={this.props.handleOpenOverlay}
+                        />
                     ))}
                 </GridLayout>
                 <PermissionsContext.Consumer>

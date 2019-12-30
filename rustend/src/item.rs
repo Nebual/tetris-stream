@@ -5,27 +5,27 @@ use DbConn;
 use models::*;
 use schema::template_item;
 
+use rocket::http::Status;
+use rocket::request::Form;
 use rocket::response::status;
-use rocket_contrib::Json;
+use rocket_contrib::json::Json;
 
 #[get("/")]
-fn index(conn: DbConn) -> QueryResult<Json<Vec<TemplateItem>>>
-{
+pub fn index(conn: DbConn) -> QueryResult<Json<Vec<TemplateItem>>> {
     let item_request = template_item::table.load(&*conn)?;
     Ok(Json(item_request))
 }
 
 #[derive(FromForm)]
-struct SearchParams {
+pub struct SearchParams {
     name: Option<String>,
 }
 
-#[get("/?<params>")]
-fn search(conn: DbConn, params: SearchParams) -> QueryResult<Json<Vec<TemplateItem>>>
-{
+#[get("/?<params..>")]
+pub fn search(conn: DbConn, params: Form<SearchParams>) -> QueryResult<Json<Vec<TemplateItem>>> {
     //let params = params.unwrap();
     let mut sql = template_item::table.into_boxed();
-    if let Some(name) = params.name {
+    if let Some(name) = &params.name {
         sql = sql.filter(template_item::dsl::name.like(format!("%{}%", name)));
     }
     let item_request = sql.load(&*conn)?;
@@ -33,8 +33,7 @@ fn search(conn: DbConn, params: SearchParams) -> QueryResult<Json<Vec<TemplateIt
 }
 
 #[get("/<item_id>")]
-fn get(item_id: i32, conn: DbConn) -> Option<Json<TemplateItem>>
-{
+pub fn get(item_id: i32, conn: DbConn) -> Option<Json<TemplateItem>> {
     if let Ok(result) = template_item::table.find(item_id).get_result(&*conn) {
         Some(Json(result))
     } else {
@@ -43,8 +42,7 @@ fn get(item_id: i32, conn: DbConn) -> Option<Json<TemplateItem>>
 }
 
 #[post("/", data = "<new_item>")]
-fn create(conn: DbConn, new_item: Json<NewTemplateItem>) -> QueryResult<Json<TemplateItem>>
-{
+pub fn create(conn: DbConn, new_item: Json<NewTemplateItem>) -> QueryResult<Json<TemplateItem>> {
     diesel::insert_into(template_item::table)
         .values(&new_item.into_inner())
         .get_result::<TemplateItem>(&*conn)
@@ -52,8 +50,11 @@ fn create(conn: DbConn, new_item: Json<NewTemplateItem>) -> QueryResult<Json<Tem
 }
 
 #[patch("/<item_id>", data = "<new_item>")]
-fn update(conn: DbConn, item_id: i32, new_item: Json<NewTemplateItem>) -> QueryResult<Json<TemplateItem>>
-{
+pub fn update(
+    conn: DbConn,
+    item_id: i32,
+    new_item: Json<NewTemplateItem>,
+) -> QueryResult<Json<TemplateItem>> {
     assert!(item_id > 0);
     diesel::update(template_item::table.find(item_id))
         .set(&new_item.into_inner())
@@ -62,12 +63,11 @@ fn update(conn: DbConn, item_id: i32, new_item: Json<NewTemplateItem>) -> QueryR
 }
 
 #[delete("/<item_id>")]
-fn delete(conn: DbConn, item_id: i32) -> Result<status::NoContent, diesel::result::Error>
-{
+pub fn delete(conn: DbConn, item_id: i32) -> Result<Status, diesel::result::Error> {
     assert!(item_id > 0);
     diesel::delete(template_item::table.find(item_id))
         .execute(&*conn)?;
-    Ok(status::NoContent)
+    Ok(Status::NoContent)
 }
 
 #[cfg(test)]

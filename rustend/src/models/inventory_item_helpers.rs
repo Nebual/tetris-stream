@@ -10,7 +10,7 @@ use super::super::{
     schema::template_item::dsl as ti,
 };
 
-sql_function!(coalesce, Coalesce, (x: Nullable<Text>, y: Text) -> Text);
+sql_function!(fn coalesce(x: Nullable<Text>, y: Text) -> Text);
 
 macro_rules! inventory_item_select {() => {
     inventory_item::table

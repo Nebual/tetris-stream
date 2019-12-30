@@ -8,20 +8,18 @@ use models::*;
 use schema::{inventory_item, template_item};
 use schema::inventory_item::dsl::*;
 
+use rocket::http::Status;
 use rocket::response::status;
-use rocket_contrib::Json;
+use rocket_contrib::json::Json;
 
 #[get("/")]
-fn index(conn: DbConn) -> QueryResult<Json<Vec<InventoryItem>>>
-{
+pub fn index(conn: DbConn) -> QueryResult<Json<Vec<InventoryItem>>> {
     let items = InventoryItem::index(conn)?;
     Ok(Json(items))
 }
 
-
 #[get("/<item_id>")]
-fn get(item_id: i32, conn: DbConn) -> Option<Json<InventoryItem>>
-{
+pub fn get(item_id: i32, conn: DbConn) -> Option<Json<InventoryItem>> {
     if let Ok(result) = InventoryItem::load(conn, item_id) {
         Some(Json(result))
     } else {
@@ -30,8 +28,7 @@ fn get(item_id: i32, conn: DbConn) -> Option<Json<InventoryItem>>
 }
 
 #[post("/", data = "<new_item>")]
-fn create(conn: DbConn, new_item: Json<NewInventoryItem>) -> QueryResult<Json<InventoryItem>>
-{
+pub fn create(conn: DbConn, new_item: Json<NewInventoryItem>) -> QueryResult<Json<InventoryItem>> {
     let result: i32 = diesel::insert_into(inventory_item)
         .values(&new_item.into_inner())
         .returning(inventory_item::id)
@@ -42,8 +39,11 @@ fn create(conn: DbConn, new_item: Json<NewInventoryItem>) -> QueryResult<Json<In
 }
 
 #[patch("/<item_id>", data = "<new_item>")]
-fn update(conn: DbConn, item_id: i32, new_item: Json<NewInventoryItem>) -> QueryResult<Json<InventoryItem>>
-{
+pub fn update(
+    conn: DbConn,
+    item_id: i32,
+    new_item: Json<NewInventoryItem>,
+) -> QueryResult<Json<InventoryItem>> {
     assert!(item_id > 0);
     let result: i32 = diesel::update(inventory_item::table.find(item_id))
         .set(&new_item.into_inner())
@@ -55,12 +55,11 @@ fn update(conn: DbConn, item_id: i32, new_item: Json<NewInventoryItem>) -> Query
 }
 
 #[delete("/<item_id>")]
-fn delete(conn: DbConn, item_id: i32) -> Result<status::NoContent, diesel::result::Error>
-{
+pub fn delete(conn: DbConn, item_id: i32) -> Result<Status, diesel::result::Error> {
     assert!(item_id > 0);
     diesel::delete(inventory_item::table.find(item_id))
         .execute(&*conn)?;
-    Ok(status::NoContent)
+    Ok(Status::NoContent)
 }
 
 

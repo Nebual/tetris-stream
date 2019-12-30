@@ -7,31 +7,29 @@ use DbConn;
 use models::*;
 use schema::{inventory, game};
 
-use rocket::response::status;
-use rocket_contrib::{Json, Value};
+use rocket::http::Status;
 use rocket::request::Form;
+use rocket::response::status;
+use rocket_contrib::json::{Json, JsonValue};
 
 #[get("/")]
-fn index(conn: DbConn) -> QueryResult<Json<Value>>
-{
+pub fn index(conn: DbConn) -> QueryResult<JsonValue> {
     _get(conn, 0)
 }
 
 #[derive(Queryable, Debug, Serialize)]
-struct GameWithPlayers {
+pub struct GameWithPlayers {
     id: i32,
     name: String,
     players: Vec<String>,
 }
 
 #[get("/<id>")]
-fn get(conn: DbConn, id: i32) -> QueryResult<Json<Value>>
-{
+pub fn get(conn: DbConn, id: i32) -> QueryResult<JsonValue> {
     assert!(id > 0);
     _get(conn, id)
 }
-fn _get(conn: DbConn, id: i32) -> Result<Json<Value>, diesel::result::Error>
-{
+fn _get(conn: DbConn, id: i32) -> Result<JsonValue, diesel::result::Error> {
     let games = if id == 0 {
         game::table.load::<Game>(&*conn)?
     } else {
@@ -54,15 +52,14 @@ fn _get(conn: DbConn, id: i32) -> Result<Json<Value>, diesel::result::Error>
     }).collect::<Vec<_>>();
 
     if id == 0 {
-        Ok(Json(json!(data)))
+        Ok(json!(data))
     } else {
-        Ok(Json(json!(data[0])))
+        Ok(json!(data[0]))
     }
 }
 
 #[post("/", data = "<new>")]
-fn create(conn: DbConn, new: Json<NewGame>) -> QueryResult<Json<Game>>
-{
+pub fn create(conn: DbConn, new: Json<NewGame>) -> QueryResult<Json<Game>> {
     diesel::insert_into(game::table)
         .values(&new.into_inner())
         .get_result::<Game>(&*conn)
@@ -70,22 +67,26 @@ fn create(conn: DbConn, new: Json<NewGame>) -> QueryResult<Json<Game>>
 }
 
 #[patch("/<id>", data = "<new>")]
-fn update(conn: DbConn, id: i32, new: Json<NewGame>) -> QueryResult<Json<GameWithPlayers>>
-{
+pub fn update(conn: DbConn, id: i32, new: Json<NewGame>) -> QueryResult<Json<GameWithPlayers>> {
     assert!(id > 0);
     diesel::update(game::table.find(id))
         .set(&new.into_inner())
         .get_result::<Game>(&*conn)
-        .map(|p| Json(GameWithPlayers{id: p.id, name: p.name, players: Vec::new()}))
+        .map(|p| {
+            Json(GameWithPlayers {
+                id: p.id,
+                name: p.name,
+                players: Vec::new(),
+            })
+        })
 }
 
 #[delete("/<id>")]
-fn delete(conn: DbConn, id: i32) -> Result<status::NoContent, diesel::result::Error>
-{
+pub fn delete(conn: DbConn, id: i32) -> Result<Status, diesel::result::Error> {
     assert!(id > 0);
     diesel::delete(game::table.find(id))
         .execute(&*conn)?;
-    Ok(status::NoContent)
+    Ok(Status::NoContent)
 }
 
 #[cfg(test)]

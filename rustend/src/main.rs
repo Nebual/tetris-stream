@@ -1,31 +1,33 @@
 #![allow(unused_imports)]
 
-#![feature(plugin, custom_derive)]
-#![plugin(rocket_codegen)]
-#![feature(custom_attribute)]
+#![feature(proc_macro_hygiene, decl_macro)]
 
+#[macro_use]
 extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
 extern crate rocket_cors;
 extern crate serde_json;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate serde_derive;
 
-use rocket::Rocket;
 use rocket::http::Method;
-use rocket_cors::{AllowedOrigins, AllowedHeaders, AllowedMethods};
+use rocket::Rocket;
+use rocket_contrib::json::JsonValue;
+use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins};
 
 #[macro_use]
 extern crate diesel;
-#[macro_use] extern crate diesel_migrations;
+#[macro_use]
+extern crate diesel_migrations;
 
 use std::env;
 
 mod pg_pool;
 pub use pg_pool::DbConn;
+use rocket::config::Environment;
 use rocket::config::LoggingLevel;
 use rocket::Config;
-use rocket::config::Environment;
 
 mod websocket;
 pub use websocket::{WSSocketData, WSSocketDataMutexVec};
@@ -42,29 +44,28 @@ fn index() -> &'static str {
     "Hello, world! Boop!!!!!"
 }
 
-
-#[error(400)]
-fn error_400() -> rocket_contrib::Json<rocket_contrib::Value> {
-    rocket_contrib::Json(json!({
+#[catch(400)]
+fn error_400() -> JsonValue {
+    json!({
         "status": "error",
         "reason": "Invalid request",
-    }))
+    })
 }
 
-#[error(404)]
-fn not_found() -> rocket_contrib::Json<rocket_contrib::Value> {
-    rocket_contrib::Json(json!({
+#[catch(404)]
+fn not_found() -> JsonValue {
+    json!({
         "status": "error",
         "reason": "Resource was not found.",
-    }))
+    })
 }
 
-#[error(500)]
-fn error_500() -> rocket_contrib::Json<rocket_contrib::Value> {
-    rocket_contrib::Json(json!({
+#[catch(500)]
+fn error_500() -> JsonValue {
+    json!({
         "status": "error",
         "reason": "Server 500'd",
-    }))
+    })
 }
 
 fn main() {
@@ -78,15 +79,15 @@ fn main() {
 fn rocket(is_test: bool) -> Rocket {
     (match is_test {
         true => {
-            let mut config = Config::new(Environment::Development).unwrap();
+            let mut config = Config::new(Environment::Development);
             config.set_log_level(LoggingLevel::Critical);
-            rocket::custom(config, true)
+            rocket::custom(config)
         },
         false => rocket::ignite()
     })
         .manage(build_pg_pool())
         .attach(build_cors_fairing(env::var("FRONTEND_HOST").unwrap_or("localhost:3000".into())))
-        .catch(errors![error_400, not_found, error_500])
+        .register(catchers![error_400, not_found, error_500])
         .mount("/", routes![index])
         .mount("/item", routes![item::index, item::search, item::get, item::create, item::update, item::delete])
         .mount("/inventoryitem", routes![inventoryitem::index, inventoryitem::get, inventoryitem::create, inventoryitem::update, inventoryitem::delete])
@@ -95,9 +96,8 @@ fn rocket(is_test: bool) -> Rocket {
 }
 
 fn build_cors_fairing(host: String) -> rocket_cors::Cors {
-    let (allowed_origins, failed_origins) = AllowedOrigins::some(&[&host]);
-    assert!(failed_origins.is_empty());
-    rocket_cors::Cors {
+    let allowed_origins = AllowedOrigins::some_exact(&[&host]);
+    rocket_cors::CorsOptions {
         allowed_origins: allowed_origins, //AllowedOrigins::all(),
         //allowed_methods: vec![Method::Get, Method::Post].into_iter().map(From::from).collect(),
         //allowed_headers: AllowedHeaders::some(&["Authorization", "Accept"]),
@@ -105,6 +105,8 @@ fn build_cors_fairing(host: String) -> rocket_cors::Cors {
         max_age: Some(600),
         ..Default::default()
     }
+    .to_cors()
+    .unwrap()
 }
 
 embed_migrations!();

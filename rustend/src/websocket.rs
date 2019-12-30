@@ -23,7 +23,7 @@ pub type WSSocketDataMutexVec = Arc<Mutex<Vec<WSSocketDataArc>>>;
 #[derive(Deserialize, Debug)]
 struct WSPacket {
     action: String,
-    value: rocket_contrib::Value,
+    value: rocket_contrib::json::JsonValue,
 }
 
 pub fn start_websocket_server() -> (WSSocketDataMutexVec, thread::JoinHandle<()>) {

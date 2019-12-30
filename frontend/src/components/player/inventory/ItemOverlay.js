@@ -3,12 +3,12 @@ import PropTypes from 'prop-types'
 import styled from "../../../utils/styled"
 
 import CloseIcon from '@material-ui/icons/Close'
-import Toolbar from 'material-ui/Toolbar'
-import Typography from 'material-ui/Typography'
-import Paper from 'material-ui/Paper'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import Paper from '@material-ui/core/Paper'
 import Immutable from 'immutable'
-import IconButton from 'material-ui/IconButton'
-import Button from 'material-ui/Button'
+import IconButton from '@material-ui/core/IconButton'
+import Button from '@material-ui/core/Button'
 
 const OverlayContainer = styled(Paper)({
     position: "fixed",

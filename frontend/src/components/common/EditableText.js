@@ -3,10 +3,10 @@ import PropTypes from 'prop-types'
 
 import CloseIcon from '@material-ui/icons/Close'
 import CheckIcon from '@material-ui/icons/Check'
-import Input from "material-ui/Input/Input"
-import InputAdornment from "material-ui/Input/InputAdornment"
-import IconButton from "material-ui/IconButton/IconButton"
-import {CircularProgress} from "material-ui/Progress"
+import Input from '@material-ui/core/Input'
+import InputAdornment from "@material-ui/core/InputAdornment"
+import IconButton from '@material-ui/core/IconButton'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 export class EditableText extends React.PureComponent {
     static propTypes = {

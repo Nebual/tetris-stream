@@ -1,9 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table'
-import Paper from 'material-ui/Paper'
-import Grid from 'material-ui/Grid'
-import Button from 'material-ui/Button'
+
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableCell from '@material-ui/core/TableCell'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
+import Paper from '@material-ui/core/Paper'
+import Grid from '@material-ui/core/Grid'
+import Button from '@material-ui/core/Button'
 import {fetchApi} from "../../../../util"
 
 export class ListItemComponent extends React.Component{

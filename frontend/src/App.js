@@ -2,8 +2,8 @@ import React, {Component} from 'react'
 import Immutable from 'immutable'
 
 import './App.css'
-import { withStyles } from 'material-ui/styles'
-import Button from 'material-ui/Button'
+import { withStyles } from '@material-ui/core/styles'
+import Button from '@material-ui/core/Button'
 
 import {MenuBar} from './components/common/MenuBar'
 import {MenuDrawer} from './components/common/MenuDrawer'

@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from 'material-ui/Button'
-import TextField from 'material-ui/TextField'
-import Paper from "material-ui/Paper"
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import Paper from '@material-ui/core/Paper'
 import {fetchApi} from "../../../../util"
 
 export class EditItemComponent extends React.Component{

@@ -1,8 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import SwipeableDrawer from 'material-ui/SwipeableDrawer'
-import List, { ListItem, ListItemIcon, ListItemText, ListSubheader } from 'material-ui/List';
-import Divider from 'material-ui/Divider'
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer'
+import List from '@material-ui/core/List';
+
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListSubheader from '@material-ui/core/ListSubheader';
+
+import Divider from '@material-ui/core/Divider'
 
 import AccountIcon from '@material-ui/icons/People';
 import InventoryIcon from '@material-ui/icons/BusinessCenter'

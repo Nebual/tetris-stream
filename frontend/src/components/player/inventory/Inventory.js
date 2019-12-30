@@ -7,7 +7,7 @@ import '../../../resize-styles.css'
 import {fetchApi} from "../../../util"
 
 import styled from "../../../utils/styled"
-import MenuItem from "material-ui/Menu/MenuItem"
+import MenuItem from "@material-ui/core/MenuItem"
 import InventoryMenu from "./InventoryMenu"
 import {InventoryItem} from "./InventoryItem"
 import {PermissionsContext} from '../../common/Contexts'

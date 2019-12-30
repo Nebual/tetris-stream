@@ -32,22 +32,22 @@ macro_rules! inventory_item_select {() => {
         .select((
             ii::id,
             ii::template_id,
-            ii::inventory_id,
             coalesce(ii::name, ti::name),
             coalesce(ii::public_description, ti::public_description),
             coalesce(ii::mechanical_description, ti::mechanical_description),
             coalesce(ii::hidden_description, ti::hidden_description),
-            ii::visible_mechanical,
-            ii::visible_private,
             sql("coalesce(inventory_item.price, template_item.price)"),
             sql("coalesce(inventory_item.width, template_item.width)"),
             sql("coalesce(inventory_item.height, template_item.height)"),
+            coalesce(ii::image_url, ti::image_url),
+            ii::visible_mechanical,
+            ii::visible_private,
+            ii::inventory_id,
             ii::x,
             ii::y,
             //coalesce_i32(ii::price, 3),
             //coalesce_i32(ii::width, 3),
             //coalesce_i32(ii::height, 3),
-            coalesce(ii::image_url, ti::image_url),
         ))
         .group_by((inventory_item::id, template_item::id))
 }}

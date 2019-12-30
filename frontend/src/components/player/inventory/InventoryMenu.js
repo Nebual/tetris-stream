@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Menu from "material-ui/Menu"
-import IconButton from 'material-ui/IconButton'
+import Menu from '@material-ui/core/Menu'
+import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
 
 import styled from "../../../utils/styled"

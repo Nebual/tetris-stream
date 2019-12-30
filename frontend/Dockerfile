@@ -1,4 +1,4 @@
-FROM node:9.9-stretch
+FROM node:12-stretch
 
 WORKDIR /app/frontend
 
